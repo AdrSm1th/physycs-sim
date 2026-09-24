@@ -1,25 +1,29 @@
-#include "Renderer.h"
-
 #include <SFML/Graphics.hpp>
 
+#include "Renderer.h"
+#include "Vec2.h"
+#include "test.h"
+
 int WinMain() {
-	Renderer renderer(1280, 720, "physics simulator", 60);
-	sf::Clock clock;
-	float smoothedFps = 0;
+  Renderer renderer(1280, 720, "physics simulator", 60);
+  sf::Clock clock;
+  float smoothedFps = 0;
 
-	while (renderer.isOpen()) {
-		renderer.pollEvent();
-		float frameDt = clock.restart().asSeconds();
-		if (frameDt > 0.25f) frameDt = 0.25f; 
+  testVec2();
 
-		float instantFps = 1.f / frameDt;
-		smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
+  while (renderer.isOpen()) {
+    renderer.pollEvent();
+    float frameDt = clock.restart().asSeconds();
+    if (frameDt > 0.25f) frameDt = 0.25f;
 
-		renderer.beginFrame();
-		renderer.drawFPS(smoothedFps);
-		renderer.drawCircle(500, 500, 100, sf::Color::Red);
-		renderer.endFrame();
-	}
+    float instantFps = 1.f / frameDt;
+    smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
 
-	return 0;
+    renderer.beginFrame();
+    renderer.drawFPS(smoothedFps);
+    renderer.drawCircle(500, 500, 100, sf::Color::Red);
+    renderer.endFrame();
+  }
+
+  return 0;
 }
