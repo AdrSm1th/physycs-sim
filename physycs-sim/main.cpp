@@ -1,16 +1,24 @@
+#include "Renderer.h"
+
 #include <SFML/Graphics.hpp>
 
 int WinMain() {
-	sf::RenderWindow window(sf::VideoMode({1280, 720}), "Physics Sim");
-	window.setFramerateLimit(60);
-	while (window.isOpen()) {
-		while (const std::optional event = window.pollEvent()) {
-			if (event->is<sf::Event::Closed>()) {
-				window.close();
-			}
-		}
-		window.clear(sf::Color::Black);
-		window.display();
+	Renderer renderer(1280, 720, "physics simulator", 60);
+	sf::Clock clock;
+	float smoothedFps = 0;
+
+	while (renderer.isOpen()) {
+		renderer.pollEvent();
+		float frameDt = clock.restart().asSeconds();
+		if (frameDt > 0.25f) frameDt = 0.25f; 
+
+		float instantFps = 1.f / frameDt;
+		smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
+
+		renderer.beginFrame();
+		renderer.drawFPS(smoothedFps);
+		renderer.drawCircle(500, 500, 100, sf::Color::Red);
+		renderer.endFrame();
 	}
 
 	return 0;
