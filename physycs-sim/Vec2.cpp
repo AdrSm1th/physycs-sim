@@ -2,7 +2,7 @@
 
 float Vec2::dot(Vec2 const other) const { return x * other.x + y * other.y; }
 
-float Vec2::length() const { return sqrt(x * x + y * y); }
+float Vec2::length() const { return (float)sqrt(x * x + y * y); }
 
 float Vec2::lengthSquared() const { return x * x + y * y; }
 

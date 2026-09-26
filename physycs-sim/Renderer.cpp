@@ -27,11 +27,11 @@ void Renderer::pollEvent() {
 
 void Renderer::beginFrame() { window.clear(sf::Color::Black); }
 
-void Renderer::drawCircle(float x, float y, float radius, sf::Color color) {
+void Renderer::drawCircle(Vec2 pos, float radius, sf::Color color) {
   sf::CircleShape shape(radius);
   shape.setOrigin(
       {radius, radius});      // ”становка позиции отрисовки в центр круга
-  shape.setPosition({x, y});  // ѕозици€ круга в глобальных координатах
+  shape.setPosition({pos.x, pos.y});  // ѕозици€ круга в глобальных координатах
   shape.setFillColor(color);
   window.draw(shape);
 }

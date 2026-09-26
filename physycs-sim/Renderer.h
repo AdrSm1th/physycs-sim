@@ -4,6 +4,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "Vec2.h"
+
 class Renderer {
  public:
   Renderer(unsigned int width, unsigned int height, const std::string& title,
@@ -11,7 +13,7 @@ class Renderer {
   bool isOpen();
   void pollEvent();
   void beginFrame();
-  void drawCircle(float x, float y, float radius, sf::Color color);
+  void drawCircle(Vec2 pos, float radius, sf::Color color);
   void endFrame();
   void drawFPS(float fps);
 

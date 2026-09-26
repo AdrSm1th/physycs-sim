@@ -2,9 +2,12 @@
 
 #include <algorithm>
 
-class Vec2 {
- public:
+struct Vec2 {
+  float x;
+  float y;
+
   Vec2(float _x, float _y) : x(_x), y(_y) {}
+  Vec2() : x(0), y(0) {}
   Vec2 operator+(const Vec2 &other) const {
     return Vec2(x + other.x, y + other.y);
   }
@@ -52,8 +55,4 @@ class Vec2 {
   Vec2 normalized() const;
   void normalize();
   void perpendicular();
-
- private:
-  float x;
-  float y;
 };

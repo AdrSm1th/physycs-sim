@@ -3,6 +3,8 @@
 #include "Renderer.h"
 #include "Vec2.h"
 #include "test.h"
+#include "Body.h"
+#include "World.h"
 
 int WinMain() {
   Renderer renderer(1280, 720, "physics simulator", 60);
@@ -10,6 +12,10 @@ int WinMain() {
   float smoothedFps = 0;
 
   testVec2();
+
+  World world;
+  Body body_1({500, 100}, 100, 5);
+  world.addBody(body_1);
 
   while (renderer.isOpen()) {
     renderer.pollEvent();
@@ -21,7 +27,9 @@ int WinMain() {
 
     renderer.beginFrame();
     renderer.drawFPS(smoothedFps);
-    renderer.drawCircle(500, 500, 100, sf::Color::Red);
+    for (Body &body : world.bodies) {
+      renderer.drawCircle(body.position, body.radius, body.color);
+    }
     renderer.endFrame();
   }
 
