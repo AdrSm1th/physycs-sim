@@ -16,5 +16,5 @@ struct Body {
 
   Body(Vec2 pos, float radius, float mass);
   void applyForce(Vec2 f);
-  void integrate(float dt); // Временно пустой
+  void integrate(float dt);
 };

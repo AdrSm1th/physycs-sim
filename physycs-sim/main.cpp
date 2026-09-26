@@ -14,6 +14,7 @@ int WinMain() {
   testVec2();
 
   World world;
+  world.gravity = {0, 500};
   Body body_1({500, 100}, 100, 5);
   world.addBody(body_1);
 
@@ -24,6 +25,8 @@ int WinMain() {
 
     float instantFps = 1.f / frameDt;
     smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
+
+    world.step(frameDt);
 
     renderer.beginFrame();
     renderer.drawFPS(smoothedFps);

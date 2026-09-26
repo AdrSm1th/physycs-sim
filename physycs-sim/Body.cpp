@@ -13,5 +13,8 @@ Body::Body(Vec2 pos, float radius, float mass) {
 
 void Body::applyForce(Vec2 f) { acceleration += f * invMass; }
 
-// Временно пустой
-void Body::integrate(float dt) {}
+void Body::integrate(float dt) { 
+  velocity += acceleration * dt;
+  position += velocity * dt;
+  acceleration = {0, 0};
+}
