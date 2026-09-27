@@ -1,4 +1,4 @@
-#include "Body.h"
+#include "../include/Body.h"
 
 Body::Body(Vec2 pos, float radius, float mass) {
   position = pos;

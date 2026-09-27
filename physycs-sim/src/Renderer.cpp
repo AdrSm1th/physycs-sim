@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "../include/Renderer.h"
 
 Renderer::Renderer(unsigned int width, unsigned int height,
                    const std::string &title, unsigned int fpsLimit)

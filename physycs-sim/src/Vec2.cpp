@@ -1,4 +1,4 @@
-#include "Vec2.h"
+#include "../include/Vec2.h"
 
 float Vec2::dot(Vec2 const other) const { return x * other.x + y * other.y; }
 
