@@ -1,4 +1,4 @@
-#include "../include/World.h"
+#include "World.h"
 
 void World::addBody(const Body& b) { bodies.push_back(b); }
 

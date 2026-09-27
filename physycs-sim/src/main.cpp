@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
 
-#include "../include/Renderer.h"
-#include "../include/Vec2.h"
-#include "../include/test.h"
-#include "../include/Body.h"
-#include "../include/World.h"
+#include "Renderer.h"
+#include "Vec2.h"
+#include "test.h"
+#include "Body.h"
+#include "World.h"
 
 int WinMain() {
   Renderer renderer(1280, 720, "physics simulator", 60);
