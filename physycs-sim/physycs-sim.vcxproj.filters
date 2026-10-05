@@ -30,6 +30,9 @@
     <ClCompile Include="src\World.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Vec2Tests.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Body.h">
@@ -38,7 +41,7 @@
     <ClInclude Include="include\Renderer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\test.h">
+    <ClInclude Include="include\Vec2Tests.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\Vec2.h">
