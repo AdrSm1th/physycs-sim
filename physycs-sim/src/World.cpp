@@ -8,3 +8,7 @@ void World::step(float dt) {
     b.integrate(dt);
   }
 }
+
+void World::reset() {
+   bodies.clear();
+}

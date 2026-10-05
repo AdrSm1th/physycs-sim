@@ -8,6 +8,10 @@
 
 struct Input {
 	bool toggleDebud = false;
+	bool togglePause = false;
+	bool reset = false;
+	bool stepOnce = false;
+	bool spawn = false;
 };
 
 class Renderer {
@@ -22,6 +26,7 @@ public:
 	void drawFPS(float fps);
 	void drawLine(Vec2 from, Vec2 to, sf::Color color);
 	void drawPoint(Vec2 pos, float radius, sf::Color color);
+	Vec2 getMouseWorldPos();
 
 private:
 	sf::RenderWindow window;

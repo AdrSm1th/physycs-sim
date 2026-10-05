@@ -17,31 +17,51 @@ int WinMain() {
 
 	World world;
 	world.gravity = { 0, 500 };
-	Body body_1({ 500, 100 }, 100, 5);
+	Body body_1({ 500, 100 }, 100, 5, sf::Color::White);
+	Body body_2({ 1000, 100 }, 100, 200, sf::Color::Yellow);
 	world.addBody(body_1);
+	world.addBody(body_2);
 
 	const float FIXED_DT = 1.0f / 120.0f; // 120 √ц физика
 	const int MAX_STEPS = 5;
+	const float BASE_RADIUS = 100.0f;
+	const float BASE_MASS = 10.0f;
 	float accumulator = 0.f;
 
 	bool debugDraw = false;
+	bool pause = false;
 
 	while (renderer.isOpen()) {
 		Input in = renderer.pollEvent();
 
-		if (in.toggleDebud) { debugDraw = !debugDraw; };
+		if (in.toggleDebud) { debugDraw = !debugDraw; }
+
+		if (in.togglePause) { pause = !pause; }
+
+		if (in.reset) { world.reset(); }
+
+		if (in.spawn) {
+			Vec2 mousePos = renderer.getMouseWorldPos();
+			Body newBody({mousePos.x, mousePos.y}, BASE_RADIUS, BASE_MASS, sf::Color::White);
+			world.addBody(newBody);
+		}
 
 		float frameDt = clock.restart().asSeconds();
 		if (frameDt > 0.25f) frameDt = 0.25f;
 
-		accumulator += frameDt;
-		int steps = 0;
-		while (accumulator >= FIXED_DT) {
-			world.step(FIXED_DT);
-			accumulator -= FIXED_DT;
-			steps++;
+		if (!pause) {
+			accumulator += frameDt;
+			int steps = 0;
+			while (accumulator >= FIXED_DT) {
+				world.step(FIXED_DT);
+				accumulator -= FIXED_DT;
+				steps++;
+			}
+			if (steps >= MAX_STEPS) accumulator = 0.f;
 		}
-		if (steps >= MAX_STEPS) accumulator = 0.f;
+		else if (in.stepOnce) {
+			world.step(FIXED_DT);
+		}
 
 		float instantFps = 1.f / frameDt;
 		smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;

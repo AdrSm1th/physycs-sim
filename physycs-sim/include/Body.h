@@ -14,7 +14,7 @@ struct Body {
   float restitution;
   sf::Color color;
 
-  Body(Vec2 pos, float radius, float mass);
+  Body(Vec2 pos, float radius, float mass, sf::Color color);
   void applyForce(Vec2 f);
   void integrate(float dt);
 };

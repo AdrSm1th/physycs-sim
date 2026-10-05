@@ -1,6 +1,6 @@
 #include "Body.h"
 
-Body::Body(Vec2 pos, float radius, float mass) {
+Body::Body(Vec2 pos, float radius, float mass, sf::Color color) {
   position = pos;
   this->radius = radius;
   this->mass = mass;
@@ -8,7 +8,7 @@ Body::Body(Vec2 pos, float radius, float mass) {
   velocity = Vec2(0, 0);
   acceleration = Vec2(0, 0);
   restitution = 0.5;         // ”пругость по умолчанию
-  color = sf::Color::White;  // ÷вет по умолчанию
+  this->color = color;
 }
 
 void Body::applyForce(Vec2 f) { acceleration += f * invMass; }

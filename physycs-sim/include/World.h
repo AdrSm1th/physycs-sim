@@ -10,4 +10,5 @@ struct World {
 
   void addBody(const Body& b);
   void step(float dt);
+  void reset();
 };

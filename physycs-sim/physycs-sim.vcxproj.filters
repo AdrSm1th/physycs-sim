@@ -30,7 +30,7 @@
     <ClCompile Include="src\World.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Vec2Tests.cpp">
+    <ClCompile Include="src\Vec2Tests.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

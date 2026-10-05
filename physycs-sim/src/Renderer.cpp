@@ -26,8 +26,27 @@ Input Renderer::pollEvent() {
 		}
 
 		if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-			if (keyPressed->code == sf::Keyboard::Key::D) {
+			switch (keyPressed->code)
+			{
+			case sf::Keyboard::Key::D:
 				in.toggleDebud = true;
+				break;
+
+			case sf::Keyboard::Key::R:
+				in.reset = true;
+				break;
+
+			case sf::Keyboard::Key::Space:
+				in.togglePause = true;
+
+			case sf::Keyboard::Key::N:
+				in.stepOnce = true;
+			}
+		}
+
+		if (const auto *mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+			if (mousePressed->button == sf::Mouse::Button::Left) {
+				in.spawn = true;
 			}
 		}
 	}
@@ -67,4 +86,12 @@ void Renderer::drawPoint(Vec2 pos, float radius, sf::Color color) {
 	shape.setPosition({ pos.x, pos.y });
 	shape.setFillColor(color);
 	window.draw(shape);
+}
+
+Vec2 Renderer::getMouseWorldPos() {
+	auto mousePosPixel = sf::Mouse::getPosition(window);
+
+	auto mousePosCoord = window.mapPixelToCoords(mousePosPixel);
+
+	return Vec2(mousePosCoord.x, mousePosCoord.y);
 }
