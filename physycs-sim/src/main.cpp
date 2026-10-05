@@ -7,13 +7,13 @@
 #include "World.h"
 
 int WinMain() {
-	Renderer renderer(1280, 720, "physics simulator", 60);
-	sf::Clock clock;
-	float smoothedFps = 0;
-
 #ifdef _DEBUG
 	testVec2();
 #endif
+
+	Renderer renderer(1280, 720, "physics simulator", 60);
+	sf::Clock clock;
+	float smoothedFps = 0;
 
 	World world;
 	world.gravity = { 0, 500 };
@@ -24,8 +24,13 @@ int WinMain() {
 	const int MAX_STEPS = 5;
 	float accumulator = 0.f;
 
+	bool debugDraw = false;
+
 	while (renderer.isOpen()) {
-		renderer.pollEvent();
+		Input in = renderer.pollEvent();
+
+		if (in.toggleDebud) { debugDraw = !debugDraw; };
+
 		float frameDt = clock.restart().asSeconds();
 		if (frameDt > 0.25f) frameDt = 0.25f;
 
@@ -36,7 +41,7 @@ int WinMain() {
 			accumulator -= FIXED_DT;
 			steps++;
 		}
-		if (steps == MAX_STEPS) accumulator = 0.f;
+		if (steps >= MAX_STEPS) accumulator = 0.f;
 
 		float instantFps = 1.f / frameDt;
 		smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
@@ -45,6 +50,10 @@ int WinMain() {
 		renderer.drawFPS(smoothedFps);
 		for (Body &body : world.bodies) {
 			renderer.drawCircle(body.position, body.radius, body.color);
+
+			if (debugDraw) {
+				renderer.drawLine(body.position, body.position + body.velocity * 0.1f, sf::Color::Red);
+			}
 		}
 		renderer.endFrame();
 	}
