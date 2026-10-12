@@ -90,6 +90,26 @@ void Renderer::drawPoint(Vec2 pos, float radius, sf::Color color) {
     window.draw(shape);
 }
 
+void Renderer::drawArrow(Vec2 start, Vec2 end, float headLen, sf::Color color) {
+    drawLine(start, end, color);
+
+    Vec2 back = (start - end).normalized();
+    if (back.lengthSquared() < 1e-6f) return;
+
+    constexpr float COS30 = 0.8660254f;
+    constexpr float SIN30 = 0.5f;
+
+    Vec2 head = back * headLen;
+
+    Vec2 left(head.x * COS30 - head.y * SIN30, head.x * SIN30 + head.y * COS30);
+
+    Vec2 right(head.x * COS30 + head.y * SIN30,
+               -head.x * SIN30 + head.y * COS30);
+
+    drawLine(end, end + left, color);
+    drawLine(end, end + right, color);
+}
+
 Vec2 Renderer::getMouseWorldPos() {
     auto mousePosPixel = sf::Mouse::getPosition(window);
 

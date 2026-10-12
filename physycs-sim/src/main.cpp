@@ -81,6 +81,37 @@ int WinMain() {
                 renderer.drawLine(body.position,
                                   body.position + body.velocity * 0.1f,
                                   sf::Color::Red);
+
+                for (const Manifold &m : world.contacts) {
+                    // Линия контакта
+                    const float MAX_PENETRATION = 50.0f;
+                    float t = m.penetration / MAX_PENETRATION;
+                    t = std::clamp(t, 0.f, 1.f);
+
+                    sf::Color color(
+                        255, static_cast<std::uint8_t>(255 * (1.f - t)), 0);
+
+                    renderer.drawLine(world.bodies[m.a].position,
+                                      world.bodies[m.b].position, color);
+
+                    // Точка соприкосновения
+                    Vec2 pointOfContact = world.bodies[m.a].position +
+                                          m.normal * world.bodies[m.a].radius;
+                    renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
+
+                    // Стрелка в сторону выталкивания
+                    constexpr float SCALE = 5.f;
+                    constexpr float HEAD_LEN = 10.f;
+                    constexpr float MIN_VISIBLE = 3.f;
+
+                    float arrowLen = m.penetration * SCALE;
+                    if (arrowLen < MIN_VISIBLE) continue;
+
+                    Vec2 end = pointOfContact + m.normal * arrowLen;
+                    renderer.drawArrow(pointOfContact, end, HEAD_LEN,
+                                       sf::Color::Cyan);
+                }
+
             }
         }
         renderer.endFrame();

@@ -1,4 +1,5 @@
 #include "World.h"
+#include "Collision.h"
 
 void World::addBody(const Body& b) { bodies.push_back(b); }
 
@@ -7,6 +8,19 @@ void World::step(float dt) {
         b.acceleration += gravity;
         b.integrate(dt);
     }
+
+    contacts.clear();
+    for (int i = 0; i < bodies.size(); i++) {
+        for (int j = i + 1; j < bodies.size(); j++) {
+            Manifold m;
+            if (Collision::circleCircle(bodies[i], bodies[j], m)) {
+                m.a = i;
+                m.b = j;
+                contacts.push_back(m);
+            }
+        }
+    }
+
 }
 
 void World::reset() { setupScene(); }
