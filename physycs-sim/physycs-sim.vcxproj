@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Body.cpp" />
+    <ClCompile Include="src\Collision.cpp" />
+    <ClCompile Include="src\CollisionTests.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Vec2.cpp" />
@@ -29,6 +31,7 @@
   <ItemGroup>
     <ClInclude Include="include\Body.h" />
     <ClInclude Include="include\Collision.h" />
+    <ClInclude Include="include\CollisionTests.h" />
     <ClInclude Include="include\Manifold.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Vec2Tests.h" />

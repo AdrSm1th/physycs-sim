@@ -6,10 +6,12 @@
 #include "Vec2.h"
 #include "Vec2Tests.h"
 #include "World.h"
+#include "CollisionTests.h"
 
 int WinMain() {
 #ifdef _DEBUG
     testVec2();
+    testCollision();
 #endif
 
     Renderer renderer(1280, 720, "physics simulator", 60);
