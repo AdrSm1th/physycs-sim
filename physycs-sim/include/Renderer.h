@@ -6,7 +6,7 @@
 #include "Vec2.h"
 
 struct Input {
-    bool toggleDebud = false;
+    bool toggleDebug = false;
     bool togglePause = false;
     bool reset = false;
     bool stepOnce = false;

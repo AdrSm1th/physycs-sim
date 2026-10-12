@@ -9,4 +9,10 @@ void World::step(float dt) {
     }
 }
 
-void World::reset() { bodies.clear(); }
+void World::reset() { setupScene(); }
+
+void World::setupScene() {
+    bodies.clear();
+    bodies.emplace_back(Vec2{500, 100}, 50, 5, sf::Color::White);
+    bodies.emplace_back(Vec2{1000, 100}, 80, 200, sf::Color::Yellow);
+}

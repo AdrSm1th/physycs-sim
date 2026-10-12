@@ -28,7 +28,7 @@ Input Renderer::pollEvent() {
         if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>()) {
             switch (keyPressed->code) {
                 case sf::Keyboard::Key::D:
-                    in.toggleDebud = true;
+                    in.toggleDebug = true;
                     break;
 
                 case sf::Keyboard::Key::R:
@@ -37,9 +37,11 @@ Input Renderer::pollEvent() {
 
                 case sf::Keyboard::Key::Space:
                     in.togglePause = true;
+                    break;
 
                 case sf::Keyboard::Key::N:
                     in.stepOnce = true;
+                    break;
             }
         }
 

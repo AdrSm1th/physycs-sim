@@ -18,12 +18,7 @@ int WinMain() {
 
     World world;
     world.gravity = {0, 500};
-    Body body_1({500, 100}, 100, 5, sf::Color::White);
-    Body body_2({1000, 100}, 100, 200, sf::Color::Yellow);
-    world.addBody(body_1);
-    world.addBody(body_2);
-
-    std::vector<Manifold> contacts;
+    world.setupScene();
 
     const float FIXED_DT = 1.0f / 120.0f;  // 120 √ц физика
     const int MAX_STEPS = 5;
