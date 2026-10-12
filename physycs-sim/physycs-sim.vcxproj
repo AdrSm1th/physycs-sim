@@ -28,6 +28,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Body.h" />
+    <ClInclude Include="include\Collision.h" />
+    <ClInclude Include="include\Manifold.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Vec2Tests.h" />
     <ClInclude Include="include\Vec2.h" />

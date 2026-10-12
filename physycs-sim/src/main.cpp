@@ -5,6 +5,7 @@
 #include "Vec2Tests.h"
 #include "Body.h"
 #include "World.h"
+#include "Manifold.h"
 
 int WinMain() {
 #ifdef _DEBUG
@@ -21,6 +22,8 @@ int WinMain() {
 	Body body_2({ 1000, 100 }, 100, 200, sf::Color::Yellow);
 	world.addBody(body_1);
 	world.addBody(body_2);
+
+	std::vector<Manifold> contacts; 
 
 	const float FIXED_DT = 1.0f / 120.0f; // 120 √ц физика
 	const int MAX_STEPS = 5;
