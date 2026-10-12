@@ -32,7 +32,7 @@ int WinMain() {
     while (renderer.isOpen()) {
         Input in = renderer.pollEvent();
 
-        if (in.toggleDebud) {
+        if (in.toggleDebug) {
             debugDraw = !debugDraw;
         }
 
