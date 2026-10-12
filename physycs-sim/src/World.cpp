@@ -1,5 +1,15 @@
 #include "World.h"
+
+#include <algorithm>
+
 #include "Collision.h"
+
+constexpr float SLOP = 0.00f;  // защита от дрожания (когда тело будет стоять на
+                               // полу, без этого параметра будет дрожание)
+constexpr float CORRECTION_PERCENT =
+    0.8f;  // С этим параметром выталкивание будет более плавным. Нужно для
+           // столкновения большого количества тел, чтобы не создавать лишних
+           // коллизий
 
 void World::addBody(const Body& b) { bodies.push_back(b); }
 
@@ -21,6 +31,24 @@ void World::step(float dt) {
         }
     }
 
+    for (const Manifold& contact : contacts) {
+        Body& a = bodies[contact.a];
+        Body& b = bodies[contact.b];
+
+        float invMassSum = a.invMass + b.invMass;
+        // Если оба тела статические, то дальнейшая обработка не имеет смысла
+        if (invMassSum == 0) {
+            continue;
+        }
+
+        // correction - защита от дрожания и лишних коллизий при групповом столкновении
+        float correction =
+            std::max(contact.penetration - SLOP, 0.0f) * CORRECTION_PERCENT;
+        correction /= invMassSum;
+
+        a.position -= contact.normal * correction * a.invMass;
+        b.position += contact.normal * correction * b.invMass;
+    }
 }
 
 void World::reset() { setupScene(); }
