@@ -100,7 +100,7 @@ int WinMain() {
                     renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
 
                     // Стрелка в сторону выталкивания
-                    constexpr float SCALE = 5.f;
+                    constexpr float SCALE = 2.f;
                     constexpr float HEAD_LEN = 10.f;
                     constexpr float MIN_VISIBLE = 3.f;
 
