@@ -3,12 +3,10 @@
 void World::addBody(const Body& b) { bodies.push_back(b); }
 
 void World::step(float dt) {
-  for (Body &b : bodies) {
-    b.acceleration += gravity;
-    b.integrate(dt);
-  }
+    for (Body& b : bodies) {
+        b.acceleration += gravity;
+        b.integrate(dt);
+    }
 }
 
-void World::reset() {
-   bodies.clear();
-}
+void World::reset() { bodies.clear(); }
