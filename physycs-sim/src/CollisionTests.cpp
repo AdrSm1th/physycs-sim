@@ -1,5 +1,9 @@
+#include "CollisionTests.h"
 #include "Collision.h"
 #include "World.h"
+
+#include <cassert>
+#include <cmath>
 
 void testCollision() {
     Body b1({100, 100}, 10, 5, sf::Color::White);
