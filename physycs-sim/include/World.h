@@ -14,4 +14,5 @@ struct World {
     void step(float dt);
     void reset();
     void setupScene();
+    void resolveContact(const Manifold& contact);
 };

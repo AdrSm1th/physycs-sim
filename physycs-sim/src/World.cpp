@@ -32,6 +32,10 @@ void World::step(float dt) {
     }
 
     for (const Manifold& contact : contacts) {
+        resolveContact(contact);
+    }
+
+    for (const Manifold& contact : contacts) {
         Body& a = bodies[contact.a];
         Body& b = bodies[contact.b];
 
@@ -49,6 +53,7 @@ void World::step(float dt) {
         a.position -= contact.normal * correction * a.invMass;
         b.position += contact.normal * correction * b.invMass;
     }
+
 }
 
 void World::reset() { setupScene(); }
@@ -57,4 +62,22 @@ void World::setupScene() {
     bodies.clear();
     bodies.emplace_back(Vec2{500, 100}, 50, 5, sf::Color::White);
     bodies.emplace_back(Vec2{1000, 100}, 80, 200, sf::Color::Yellow);
+}
+
+void World::resolveContact(const Manifold& contact) {
+    Body& a = bodies[contact.a];
+    Body& b = bodies[contact.b];
+    float vRel = contact.normal.dot(b.velocity - a.velocity);
+
+    if (vRel >= 0) {
+        return;
+    }
+
+    // Выбор минимальной упругости
+    float restitution = std::min(a.restitution, b.restitution);
+
+    float pulse = -(1 + restitution) * vRel / (a.invMass + b.invMass);
+
+    a.velocity -= contact.normal * (pulse * a.invMass);
+    b.velocity += contact.normal * (pulse * b.invMass);
 }
