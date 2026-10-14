@@ -7,7 +7,7 @@ Body::Body(Vec2 pos, float radius, float mass, sf::Color color) {
     invMass = mass > 0.0 ? 1.0f / mass : 0.0;
     velocity = Vec2(0, 0);
     acceleration = Vec2(0, 0);
-    restitution = 0.5;  // ”пругость по умолчанию
+    restitution = 0.5f;  // ”пругость по умолчанию
     this->color = color;
 }
 

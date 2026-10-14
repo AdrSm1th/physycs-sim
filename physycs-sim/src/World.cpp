@@ -11,6 +11,9 @@ constexpr float CORRECTION_PERCENT =
            // столкновения большого количества тел, чтобы не создавать лишних
            // коллизий
 
+constexpr int ITERATIONS = 10;  // Для корректного разрешения столкновения
+                                // цепочки тел нужно несколько итераций
+
 void World::addBody(const Body& b) { bodies.push_back(b); }
 
 void World::step(float dt) {
@@ -31,8 +34,11 @@ void World::step(float dt) {
         }
     }
 
-    for (const Manifold& contact : contacts) {
-        resolveContact(contact);
+    for (int i = 0; i < ITERATIONS; i++) {
+        for (const Manifold& contact : contacts) {
+            resolveContact(contact);
+        }
+        // resolveContact(contact);
     }
 
     for (const Manifold& contact : contacts) {
@@ -45,7 +51,8 @@ void World::step(float dt) {
             continue;
         }
 
-        // correction - защита от дрожания и лишних коллизий при групповом столкновении
+        // correction - защита от дрожания и лишних коллизий при групповом
+        // столкновении
         float correction =
             std::max(contact.penetration - SLOP, 0.0f) * CORRECTION_PERCENT;
         correction /= invMassSum;
@@ -53,15 +60,20 @@ void World::step(float dt) {
         a.position -= contact.normal * correction * a.invMass;
         b.position += contact.normal * correction * b.invMass;
     }
-
 }
 
 void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
-    bodies.emplace_back(Vec2{500, 100}, 50, 5, sf::Color::White);
-    bodies.emplace_back(Vec2{1000, 100}, 80, 200, sf::Color::Yellow);
+     bodies.emplace_back(Vec2{100, 500}, 50, 5, sf::Color::White);
+     bodies.emplace_back(Vec2{710, 500}, 50, 5, sf::Color::Yellow);
+     bodies.emplace_back(Vec2{700, 570}, 50, 5, sf::Color::Yellow);
+     bodies.emplace_back(Vec2{700, 430}, 50, 5, sf::Color::Yellow);
+     bodies.emplace_back(Vec2{760, 525}, 50, 5, sf::Color::Yellow);
+     bodies.emplace_back(Vec2{760, 475}, 50, 5, sf::Color::Yellow);
+     bodies.emplace_back(Vec2{820, 500}, 50, 5, sf::Color::Yellow);
+     bodies[0].applyForce({150000, 0});
 }
 
 void World::resolveContact(const Manifold& contact) {

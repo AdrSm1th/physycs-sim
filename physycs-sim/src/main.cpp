@@ -20,12 +20,12 @@ int WinMain() {
     float smoothedFps = 0;
 
     World world;
-    world.gravity = {0, 500};
+    world.gravity = {0, 0};
     world.setupScene();
 
     const float FIXED_DT = 1.0f / 120.0f;  // 120 √ц физика
     const int MAX_STEPS = 5;
-    const float BASE_RADIUS = 100.0f;
+    const float BASE_RADIUS = 40.0f;
     const float BASE_MASS = 10.0f;
     float accumulator = 0.f;
 
