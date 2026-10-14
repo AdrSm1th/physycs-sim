@@ -2,17 +2,12 @@
 
 Renderer::Renderer(unsigned int width, unsigned int height,
                    const std::string &title, unsigned int fpsLimit)
-    : font(),
-      window(sf::VideoMode({width, height}), title),
-      fpsText(font, "FPS: 0", 18) {
+    : font(), window(sf::VideoMode({width, height}), title) {
     window.setFramerateLimit(fpsLimit);
 
     if (!font.openFromFile("assets/Insight Sans SSi.ttf")) {
         throw std::runtime_error("Font not loaded");
     }
-
-    fpsText.setFillColor(sf::Color::White);
-    fpsText.setPosition({10.f, 10.f});
 }
 
 bool Renderer::isOpen() { return window.isOpen(); }
@@ -70,11 +65,6 @@ void Renderer::drawCircle(Vec2 pos, float radius, sf::Color color) {
 
 void Renderer::endFrame() { window.display(); }
 
-void Renderer::drawFPS(float fps) {
-    fpsText.setString("FPS: " + std::to_string(static_cast<int>(fps)));
-    window.draw(fpsText);
-}
-
 void Renderer::drawLine(Vec2 from, Vec2 to, sf::Color color) {
     sf::VertexArray line(sf::PrimitiveType::Lines, 2);
     line[0] = sf::Vertex{{from.x, from.y}, color};
@@ -116,4 +106,35 @@ Vec2 Renderer::getMouseWorldPos() {
     auto mousePosCoord = window.mapPixelToCoords(mousePosPixel);
 
     return Vec2(mousePosCoord.x, mousePosCoord.y);
+}
+
+void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount, float energy) {
+    const float x = 10.0f;
+    const float y = 10.0f;
+    const float h = 30.0f;
+
+    std::string textstr = "FPS: ";
+    textstr += std::to_string(FPS);
+    sf::Text text(font, textstr, 18);
+    text.setFillColor(sf::Color::White);
+    text.setPosition({x, y});
+    window.draw(text);
+
+    textstr = "Bodies: ";
+    textstr += std::to_string(bodiesCount);
+    text.setString(textstr);
+    text.setPosition({x, y + h * 1});
+    window.draw(text);
+
+    textstr = "Contacts: ";
+    textstr += std::to_string(contatctCount);
+    text.setString(textstr);
+    text.setPosition({x, y + h * 2});
+    window.draw(text);
+
+    textstr = "Energy: ";
+    textstr += std::to_string(energy);
+    text.setString(textstr);
+    text.setPosition({x, y + h * 3});
+    window.draw(text);
 }

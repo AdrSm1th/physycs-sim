@@ -4,7 +4,7 @@ Body::Body(Vec2 pos, float radius, float mass, sf::Color color) {
     position = pos;
     this->radius = radius;
     this->mass = mass;
-    invMass = mass > 0.0 ? 1.0f / mass : 0.0;
+    invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
     velocity = Vec2(0, 0);
     acceleration = Vec2(0, 0);
     restitution = 0.5f;  // ”пругость по умолчанию

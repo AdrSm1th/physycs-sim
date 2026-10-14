@@ -74,7 +74,9 @@ int WinMain() {
         smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
 
         renderer.beginFrame();
-        renderer.drawFPS(smoothedFps);
+
+        renderer.debugDrawText(smoothedFps, world.bodies.size(), world.contacts.size(), world.kineticEnergy());
+
         for (Body &body : world.bodies) {
             renderer.drawCircle(body.position, body.radius, body.color);
 

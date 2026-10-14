@@ -66,14 +66,14 @@ void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
-     bodies.emplace_back(Vec2{100, 500}, 50, 5, sf::Color::White);
-     bodies.emplace_back(Vec2{710, 500}, 50, 5, sf::Color::Yellow);
-     bodies.emplace_back(Vec2{700, 570}, 50, 5, sf::Color::Yellow);
-     bodies.emplace_back(Vec2{700, 430}, 50, 5, sf::Color::Yellow);
-     bodies.emplace_back(Vec2{760, 525}, 50, 5, sf::Color::Yellow);
-     bodies.emplace_back(Vec2{760, 475}, 50, 5, sf::Color::Yellow);
-     bodies.emplace_back(Vec2{820, 500}, 50, 5, sf::Color::Yellow);
-     bodies[0].applyForce({150000, 0});
+    bodies.emplace_back(Vec2{100, 500}, 50, 5, sf::Color::White);
+    bodies.emplace_back(Vec2{710, 500}, 50, 5, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{700, 570}, 50, 5, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{700, 430}, 50, 5, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{760, 525}, 50, 5, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{760, 475}, 50, 5, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{820, 500}, 50, 5, sf::Color::Yellow);
+    bodies[0].applyForce({150000, 0});
 }
 
 void World::resolveContact(const Manifold& contact) {
@@ -92,4 +92,14 @@ void World::resolveContact(const Manifold& contact) {
 
     a.velocity -= contact.normal * (pulse * a.invMass);
     b.velocity += contact.normal * (pulse * b.invMass);
+}
+
+float World::kineticEnergy() const {
+    float kineticEnergy = 0;
+    for (const Body& body : bodies) {
+        if (body.invMass > 0) {
+            kineticEnergy += 0.5 * body.velocity.lengthSquared() * body.mass;
+        }
+    }
+    return kineticEnergy;
 }
