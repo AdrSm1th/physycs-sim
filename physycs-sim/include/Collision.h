@@ -6,4 +6,5 @@
 namespace Collision {
 bool circleCircle(const Body &a, const Body &b, Manifold &m);
 bool circleBox(const Body &a, const Body &b, Manifold &m);
+bool boxBox(const Body &a, const Body &b, Manifold &m);
 }

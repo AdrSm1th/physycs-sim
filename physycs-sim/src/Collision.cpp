@@ -102,4 +102,37 @@ bool circleBox(const Body& a, const Body& b, Manifold& m) {
     }
     return false;
 }
+
+bool boxBox(const Body& a, const Body& b, Manifold& m) {
+    auto* ca = std::get_if<BoxShape>(&a.shape);
+    auto* cb = std::get_if<BoxShape>(&b.shape);
+
+    assert(ca && cb && "box_box called with non-box body");
+
+    float overlapX = (ca->halfExtents.x + cb->halfExtents.x) -
+                     fabs(a.position.x - b.position.x);
+    float overlapY = (ca->halfExtents.y + cb->halfExtents.y) -
+                     fabs(a.position.y - b.position.y);
+
+    if (overlapX <= 0 || overlapY < 0) {
+        m.valid = false;
+        return false;
+    }
+
+    if (overlapX < overlapY) {
+        m.normal = b.position.x - a.position.x >= 0 ? Vec2{1.0f, 0.0f}
+                                                   : Vec2{-1.0f, 0.0f};
+        m.penetration = overlapX;
+    } else if (overlapX > overlapY) {
+        m.normal = b.position.y - a.position.y >= 0 ? Vec2{0.0f, 1.0f}
+                                                   : Vec2{0.0f, -1.0f};
+        m.penetration = overlapY;
+    } else {
+        m.normal = {1.0f, 0.0f};
+        m.penetration = std::min(overlapY, overlapY);
+    }
+
+    m.valid = true;
+    return true;
+}
 }  // namespace Collision

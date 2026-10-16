@@ -60,4 +60,61 @@ void testCollision() {
     circle.position.y = 100;
     Collision::circleBox(circle, box, m);
     assert(m.penetration > 0);
+
+    Body boxA({100, 100}, Vec2{20, 10}, 5, sf::Color::White);
+    Body boxB({500, 100}, Vec2{20, 10}, 5, sf::Color::White);
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == false);
+
+    boxA.position = {100, 100};
+    boxB.position = {140, 100};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == false);
+
+    boxA.position = {100, 100};
+    boxB.position = {130, 100};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == true);
+    assert(m.normal.x > 0 && fabs(m.normal.y) < 1e-6);
+    assert(fabs(m.penetration - 10.f) < 1e-4);
+
+    boxA.position = {100, 100};
+    boxB.position = {100, 130};
+    boxB.position = {100, 115};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == true);
+    assert(fabs(m.normal.x) < 1e-6 && m.normal.y > 0);
+    assert(fabs(m.penetration - 5.f) < 1e-4);
+
+    boxA.position = {100, 100};
+    boxB.position = {70, 100};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == true);
+    assert(m.normal.x < 0 && fabs(m.normal.y) < 1e-6);
+
+    boxA.position = {100, 100};
+    boxB.position = {100, 85};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == true);
+    assert(fabs(m.normal.x) < 1e-6 && m.normal.y < 0);
+
+    boxA.position = {100, 100};
+    boxB.position = {125, 112};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == true);
+    assert(fabs(m.normal.length() - 1.f) < 1e-4);
+
+    boxA.position = {100, 100};
+    boxB.position = {100, 100};
+    Collision::boxBox(boxA, boxB, m);
+    assert(m.valid == true);
+    assert(m.normal == Vec2({0, 1}));
+    assert(fabs(m.penetration - 20.f) < 1e-4);
+
+    Body boxC({100, 100}, Vec2{30, 15}, 5, sf::Color::White);
+    boxA.position = {100, 100};
+    Collision::boxBox(boxA, boxC, m);
+    assert(m.valid == true);
+    assert(m.normal == Vec2({0, 1}));
+    assert(fabs(m.penetration - 25.f) < 1e-4);
 }
