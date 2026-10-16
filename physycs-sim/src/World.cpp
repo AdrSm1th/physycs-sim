@@ -1,7 +1,9 @@
 #include "World.h"
 
 #include <algorithm>
+#include <variant>
 
+#include "Body.h"
 #include "Collision.h"
 
 constexpr float SLOP = 0.01f;  // защита от дрожания (когда тело будет стоять на
@@ -18,7 +20,7 @@ void World::addBody(const Body& b) { bodies.push_back(b); }
 
 void World::step(float dt) {
     for (Body& b : bodies) {
-        b.acceleration += gravity;
+        b.applyForce(gravity * b.mass);
         b.integrate(dt);
     }
 
@@ -26,7 +28,9 @@ void World::step(float dt) {
     for (int i = 0; i < bodies.size(); i++) {
         for (int j = i + 1; j < bodies.size(); j++) {
             Manifold m;
-            if (Collision::circleCircle(bodies[i], bodies[j], m)) {
+            auto* ra = std::get_if<CircleShape>(&bodies[i].shape);
+            auto* rb = std::get_if<CircleShape>(&bodies[j].shape);
+            if (ra && rb && Collision::circleCircle(bodies[i], bodies[j], m)) {
                 m.a = i;
                 m.b = j;
                 contacts.push_back(m);
@@ -66,14 +70,18 @@ void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
-    bodies.emplace_back(Vec2{100, 500}, 50, 5, sf::Color::White);
-    bodies.emplace_back(Vec2{710, 500}, 50, 5, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{700, 570}, 50, 5, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{700, 430}, 50, 5, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{760, 525}, 50, 5, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{760, 475}, 50, 5, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{820, 500}, 50, 5, sf::Color::Yellow);
-    bodies[0].applyForce({150000, 0});
+    bodies.emplace_back(Vec2{100, 100}, 50, 5, sf::Color::White);
+    bodies.emplace_back(Vec2{300, 100}, 50, 500, sf::Color::White);
+
+    //bodies.emplace_back(Vec2{100, 500}, 50, 5, sf::Color::White);
+    //bodies.emplace_back(Vec2{710, 500}, 50, 5, sf::Color::Yellow);
+    //bodies.emplace_back(Vec2{700, 570}, 50, 5, sf::Color::Yellow);
+    //bodies.emplace_back(Vec2{700, 430}, 50, 5, sf::Color::Yellow);
+    //bodies.emplace_back(Vec2{760, 525}, 50, 5, sf::Color::Yellow);
+    //bodies.emplace_back(Vec2{760, 475}, 50, 5, sf::Color::Yellow);
+    //bodies.emplace_back(Vec2{820, 500}, 50, 5, sf::Color::Yellow);
+    //bodies.emplace_back(Vec2{200, 700}, Vec2{1000, 200}, 0, sf::Color::White);
+    //bodies[0].applyForce({150000, 0});
 }
 
 void World::resolveContact(const Manifold& contact) {

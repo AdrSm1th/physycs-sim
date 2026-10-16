@@ -1,13 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <algorithm>
+#include <variant>
 
 #include "Body.h"
+#include "CollisionTests.h"
 #include "Manifold.h"
 #include "Renderer.h"
 #include "Vec2.h"
 #include "Vec2Tests.h"
 #include "World.h"
-#include "CollisionTests.h"
 
 int WinMain() {
 #ifdef _DEBUG
@@ -20,7 +21,7 @@ int WinMain() {
     float smoothedFps = 0;
 
     World world;
-    world.gravity = {0, 0};
+    world.gravity = {0, 500};
     world.setupScene();
 
     const float FIXED_DT = 1.0f / 120.0f;  // 120 Гц физика
@@ -75,10 +76,22 @@ int WinMain() {
 
         renderer.beginFrame();
 
-        renderer.debugDrawText(smoothedFps, world.bodies.size(), world.contacts.size(), world.kineticEnergy());
+        renderer.debugDrawText(smoothedFps, world.bodies.size(),
+                               world.contacts.size(), world.kineticEnergy());
 
         for (Body &body : world.bodies) {
-            renderer.drawCircle(body.position, body.radius, body.color);
+            std::visit(
+                [&](auto &&arg) {
+                    using T = std::decay_t<decltype(arg)>;
+                    if constexpr (std::is_same_v<T, CircleShape>) {
+                        renderer.drawCircle(body.position, arg.radius,
+                                            body.color);
+                    } else if constexpr (std::is_same_v<T, BoxShape>) {
+                        renderer.drawBox(body.position, arg.halfExterns,
+                                         body.color);
+                    }
+                },
+                body.shape);
 
             if (debugDraw) {
                 renderer.drawLine(body.position,
@@ -100,9 +113,10 @@ int WinMain() {
                 renderer.drawLine(world.bodies[m.a].position,
                                   world.bodies[m.b].position, color);
 
+                auto *c = std::get_if<CircleShape>(&world.bodies[m.a].shape);
                 // Точка соприкосновения
-                Vec2 pointOfContact = world.bodies[m.a].position +
-                                      m.normal * world.bodies[m.a].radius;
+                Vec2 pointOfContact =
+                    world.bodies[m.a].position + m.normal * c->radius;
                 renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
 
                 // Стрелка в сторону выталкивания
@@ -117,7 +131,6 @@ int WinMain() {
                 renderer.drawArrow(pointOfContact, end, HEAD_LEN,
                                    sf::Color::Cyan);
             }
-
         }
 
         renderer.endFrame();

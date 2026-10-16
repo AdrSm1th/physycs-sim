@@ -26,8 +26,11 @@ void testCollision() {
 
     b2.position.x = 10;
     b2.position.y = 100;
+    float r1 = std::get<CircleShape>(b1.shape).radius;
+    float r2 = std::get<CircleShape>(b2.shape).radius;
+    float radiusSum = r1 + r2;
     Collision::circleCircle(b1, b2, m);
-    assert(m.valid == true && m.penetration == b1.radius + b2.radius);
+    assert(m.valid && m.penetration == radiusSum);
 
     b2.position.x = 15;
     b2.position.y = 100;

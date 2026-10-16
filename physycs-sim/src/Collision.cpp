@@ -1,12 +1,20 @@
 #include "Collision.h"
 
+#include <variant>
+#include <cassert>
+
 namespace Collision {
 bool circleCircle(const Body &a, const Body &b, Manifold &m) {
+    auto *ra = std::get_if<CircleShape>(&a.shape);
+    auto *rb = std::get_if<CircleShape>(&b.shape);
+    assert(ra && rb && "circleCircle called with non-circle body");
+
     Vec2 delta = b.position - a.position;
 
     float distSq = delta.lengthSquared();
 
-    float radiusSum = a.radius + b.radius;
+    float radiusSum = ra->radius + rb->radius;
+
     if (distSq >= radiusSum * radiusSum) {
         m.valid = false;
         return false;

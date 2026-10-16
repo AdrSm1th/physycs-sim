@@ -63,6 +63,15 @@ void Renderer::drawCircle(Vec2 pos, float radius, sf::Color color) {
     window.draw(shape);
 }
 
+void Renderer::drawBox(Vec2 pos, Vec2 halfExterns, sf::Color color) {
+    sf::RectangleShape box;
+    box.setSize({halfExterns.x * 2.f, halfExterns.y * 2.f});
+    box.setOrigin({halfExterns.x, halfExterns.y});
+    box.setPosition({pos.x, pos.y});
+    box.setFillColor(color);
+    window.draw(box);
+}
+
 void Renderer::endFrame() { window.display(); }
 
 void Renderer::drawLine(Vec2 from, Vec2 to, sf::Color color) {
@@ -108,7 +117,8 @@ Vec2 Renderer::getMouseWorldPos() {
     return Vec2(mousePosCoord.x, mousePosCoord.y);
 }
 
-void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount, float energy) {
+void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
+                             float energy) {
     const float x = 10.0f;
     const float y = 10.0f;
     const float h = 30.0f;

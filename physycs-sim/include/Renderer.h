@@ -21,6 +21,7 @@ class Renderer {
     Input pollEvent();
     void beginFrame();
     void drawCircle(Vec2 pos, float radius, sf::Color color);
+    void drawBox(Vec2 pos, Vec2 halfExterns, sf::Color color);
     void endFrame();
     void drawLine(Vec2 from, Vec2 to, sf::Color color);
     void drawPoint(Vec2 pos, float radius, sf::Color color);
