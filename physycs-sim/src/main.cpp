@@ -100,7 +100,7 @@ int WinMain() {
             }
         }
 
-if (debugDraw) {
+        if (debugDraw) {
             constexpr float MAX_PENETRATION = 50.0f;
             constexpr float SCALE = 2.f;
             constexpr float HEAD_LEN = 10.f;
