@@ -54,7 +54,7 @@ void testCollision() {
     circle.position.x = 135;
     circle.position.y = 85;
     Collision::circleBox(circle, box, m);
-    assert(m.normal.x > 0 && m.normal.y < 0);
+    assert(m.normal.x < 0 && m.normal.y > 0);
 
     circle.position.x = 120;
     circle.position.y = 100;

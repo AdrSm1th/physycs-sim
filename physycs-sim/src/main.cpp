@@ -100,29 +100,38 @@ int WinMain() {
             }
         }
 
-        if (debugDraw) {
-            for (const Manifold &m : world.contacts) {
-                // Линия контакта
-                const float MAX_PENETRATION = 50.0f;
-                float t = m.penetration / MAX_PENETRATION;
-                t = std::clamp(t, 0.f, 1.f);
+if (debugDraw) {
+            constexpr float MAX_PENETRATION = 50.0f;
+            constexpr float SCALE = 2.f;
+            constexpr float HEAD_LEN = 10.f;
+            constexpr float MIN_VISIBLE = 3.f;
 
+            for (const Manifold &m : world.contacts) {
+                const Body &a = world.bodies[m.a];
+                const Body &b = world.bodies[m.b];
+
+                float t = std::clamp(m.penetration / MAX_PENETRATION, 0.f, 1.f);
                 sf::Color color(255, static_cast<std::uint8_t>(255 * (1.f - t)),
                                 0);
+                renderer.drawLine(a.position, b.position, color);
 
-                renderer.drawLine(world.bodies[m.a].position,
-                                  world.bodies[m.b].position, color);
+                Vec2 pointOfContact;
+                bool hasPoint = false;
 
-                auto *c = std::get_if<CircleShape>(&world.bodies[m.a].shape);
-                // Точка соприкосновения
-                Vec2 pointOfContact =
-                    world.bodies[m.a].position + m.normal * c->radius;
+                if (auto *ca = std::get_if<CircleShape>(&a.shape)) {
+                    pointOfContact = a.position + m.normal * ca->radius;
+                    hasPoint = true;
+                } else if (auto *ba = std::get_if<BoxShape>(&a.shape)) {
+                    Vec2 d = {
+                        ba->halfExtents.x * (m.normal.x >= 0.f ? 1.f : -1.f),
+                        ba->halfExtents.y * (m.normal.y >= 0.f ? 1.f : -1.f)};
+                    pointOfContact = a.position + d;
+                    hasPoint = true;
+                }
+
+                if (!hasPoint) continue;
+
                 renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
-
-                // Стрелка в сторону выталкивания
-                constexpr float SCALE = 2.f;
-                constexpr float HEAD_LEN = 10.f;
-                constexpr float MIN_VISIBLE = 3.f;
 
                 float arrowLen = m.penetration * SCALE;
                 if (arrowLen < MIN_VISIBLE) continue;

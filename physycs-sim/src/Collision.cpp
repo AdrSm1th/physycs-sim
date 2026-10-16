@@ -43,7 +43,7 @@ bool circleBoxImpl(Vec2 posA, float radius, Vec2 posB, Vec2 halfExterns,
     closest.y =
         std::clamp(posA.y, posB.y - halfExterns.y, posB.y + halfExterns.y);
 
-    Vec2 delta = posA - closest;
+    Vec2 delta = closest - posA;
 
     float distSq = delta.lengthSquared();
 
@@ -63,13 +63,13 @@ bool circleBoxImpl(Vec2 posA, float radius, Vec2 posB, Vec2 halfExterns,
         auto minDist = std::min({distLeft, distRight, distUp, distDown});
 
         if (minDist == distLeft) {
-            m.normal = {-1.0f, 0.0f};
-        } else if (minDist == distRight) {
             m.normal = {1.0f, 0.0f};
+        } else if (minDist == distRight) {
+            m.normal = {-1.0f, 0.0f};
         } else if (minDist == distUp) {
-            m.normal = {0.0f, 1.0f};
+            m.normal = {0.0f, -1.0f};
         } else {
-            m.normal = {0.0, -1.0f};
+            m.normal = {0.0, 1.0f};
         }
 
         m.penetration = radius + minDist;
