@@ -37,8 +37,8 @@
 - [x] Позиционная коррекция
 - [x] Итеративное разрешение контактов (sequential impulse)
 - [x] Диагностика энергии системы
-- [ ] Статические тела (`invMass = 0`) и стены
-- [ ] AABB: детекция circle–AABB, AABB–AABB
+- [x] Статические тела (`invMass = 0`) и стены
+- [x] AABB: детекция circle–AABB, AABB–AABB
 - [ ] Стабильность: substepping, resting threshold
 - [ ] Вращение и угловая динамика, трение (Coulomb)
 - [ ] Broad phase (spatial grid)
