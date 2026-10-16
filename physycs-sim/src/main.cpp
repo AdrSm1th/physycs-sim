@@ -87,7 +87,7 @@ int WinMain() {
                         renderer.drawCircle(body.position, arg.radius,
                                             body.color);
                     } else if constexpr (std::is_same_v<T, BoxShape>) {
-                        renderer.drawBox(body.position, arg.halfExterns,
+                        renderer.drawBox(body.position, arg.halfExtents,
                                          body.color);
                     }
                 },

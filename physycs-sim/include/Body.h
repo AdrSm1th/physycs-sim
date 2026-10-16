@@ -11,7 +11,7 @@ struct CircleShape {
 };
 
 struct BoxShape {
-    Vec2 halfExterns;
+    Vec2 halfExtents;
 };
 
 using Shape = std::variant<CircleShape, BoxShape>;
@@ -27,7 +27,7 @@ struct Body {
     sf::Color color;
 
     Body(Vec2 pos, float radius, float mass, sf::Color color);
-    Body(Vec2 pos, Vec2 halfExterns, float mass, sf::Color color);
+    Body(Vec2 pos, Vec2 halfExtents, float mass, sf::Color color);
     void applyForce(Vec2 f);
     void integrate(float dt);
 };
