@@ -52,6 +52,12 @@ int WinMain() {
             Vec2 mousePos = renderer.getMouseWorldPos();
             Body newBody({mousePos.x, mousePos.y}, BASE_RADIUS, BASE_MASS,
                          sf::Color::White);
+
+            float angle = (rand() % 360) * 3.14159f / 180.f;
+            float speed = 300.f;
+            newBody.velocity = {std::cos(angle) * speed,
+                                std::sin(angle) * speed};
+
             world.addBody(newBody);
         }
 
@@ -115,22 +121,7 @@ int WinMain() {
                                 0);
                 renderer.drawLine(a.position, b.position, color);
 
-                Vec2 pointOfContact;
-                bool hasPoint = false;
-
-                if (auto *ca = std::get_if<CircleShape>(&a.shape)) {
-                    pointOfContact = a.position + m.normal * ca->radius;
-                    hasPoint = true;
-                } else if (auto *ba = std::get_if<BoxShape>(&a.shape)) {
-                    Vec2 d = {
-                        ba->halfExtents.x * (m.normal.x >= 0.f ? 1.f : -1.f),
-                        ba->halfExtents.y * (m.normal.y >= 0.f ? 1.f : -1.f)};
-                    pointOfContact = a.position + d;
-                    hasPoint = true;
-                }
-
-                if (!hasPoint) continue;
-
+                Vec2 pointOfContact = m.contactPoint;
                 renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
 
                 float arrowLen = m.penetration * SCALE;

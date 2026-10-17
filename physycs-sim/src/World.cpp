@@ -81,22 +81,14 @@ void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
+    bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0, sf::Color::White);
+    bodies.emplace_back(Vec2{640, 0}, Vec2{620, 20}, 0, sf::Color::White);
+    bodies.emplace_back(Vec2{0, 360}, Vec2{20, 360}, 0, sf::Color::White);
+    bodies.emplace_back(Vec2{1280, 360}, Vec2{20, 360}, 0, sf::Color::White);
+    bodies.emplace_back(Vec2{640, 360}, Vec2{100, 100}, 0, sf::Color::White);
+    bodies.emplace_back(Vec2{840, 440}, Vec2{100, 20}, 0, sf::Color::White);
     bodies.emplace_back(Vec2{100, 100}, 50, 5, sf::Color::White);
     bodies.emplace_back(Vec2{300, 100}, 50, 500, sf::Color::White);
-    bodies.emplace_back(Vec2{100, 600}, Vec2{1000, 50}, 0, sf::Color::White);
-    bodies.emplace_back(Vec2{500, 100}, Vec2{50, 50}, 5, sf::Color::White);
-    bodies.emplace_back(Vec2{500, 400}, Vec2{50, 50}, 5, sf::Color::White);
-    bodies[4].applyForce({0, 500});
-
-    // bodies.emplace_back(Vec2{100, 500}, 50, 5, sf::Color::White);
-    // bodies.emplace_back(Vec2{710, 500}, 50, 5, sf::Color::Yellow);
-    // bodies.emplace_back(Vec2{700, 570}, 50, 5, sf::Color::Yellow);
-    // bodies.emplace_back(Vec2{700, 430}, 50, 5, sf::Color::Yellow);
-    // bodies.emplace_back(Vec2{760, 525}, 50, 5, sf::Color::Yellow);
-    // bodies.emplace_back(Vec2{760, 475}, 50, 5, sf::Color::Yellow);
-    // bodies.emplace_back(Vec2{820, 500}, 50, 5, sf::Color::Yellow);
-    // bodies.emplace_back(Vec2{200, 700}, Vec2{1000, 200}, 0,
-    // sf::Color::White); bodies[0].applyForce({150000, 0});
 }
 
 void World::resolveContact(const Manifold& contact) {

@@ -9,5 +9,6 @@ struct Manifold {
 
     Vec2 normal;
     float penetration = 0;
+    Vec2 contactPoint;
     bool valid = false;
 };

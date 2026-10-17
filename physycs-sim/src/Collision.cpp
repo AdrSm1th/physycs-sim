@@ -30,7 +30,7 @@ bool circleCircle(const Body& a, const Body& b, Manifold& m) {
     }
 
     m.penetration = radiusSum - dist;
-
+    m.contactPoint = a.position + m.normal * ra->radius;
     m.valid = true;
     return true;
 }
@@ -79,7 +79,7 @@ bool circleBoxImpl(Vec2 posA, float radius, Vec2 posB, Vec2 halfExterns,
     }
 
     m.valid = true;
-
+    m.contactPoint = closest;
     return true;
 }
 
@@ -132,6 +132,7 @@ bool boxBox(const Body& a, const Body& b, Manifold& m) {
         m.penetration = std::min(overlapY, overlapY);
     }
 
+     m.contactPoint = (a.position + b.position) * 0.5f;
     m.valid = true;
     return true;
 }
