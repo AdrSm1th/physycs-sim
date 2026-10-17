@@ -156,7 +156,3 @@ void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
     text.setPosition({x, y + h * 3});
     window.draw(text);
 }
-
-bool Renderer::isMouseLeftPressed() const {
-    return sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
-}

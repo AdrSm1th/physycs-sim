@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <variant>
+#include <cmath>
 
 namespace Collision {
 bool circleCircle(const Body& a, const Body& b, Manifold& m) {
@@ -47,7 +48,7 @@ bool circleBoxImpl(Vec2 posA, float radius, Vec2 posB, Vec2 halfExterns,
 
     float distSq = delta.lengthSquared();
 
-    if (distSq > radius * radius) {
+    if (distSq >= radius * radius) {
         m.valid = false;
         return false;
     }
@@ -57,16 +58,16 @@ bool circleBoxImpl(Vec2 posA, float radius, Vec2 posB, Vec2 halfExterns,
     if (dist < 1e-6) {
         float distLeft = posA.x - (posB.x - halfExterns.x);
         float distRight = (posB.x + halfExterns.x) - posA.x;
-        float distUp = (posB.y + halfExterns.y) - posA.y;
-        float distDown = posA.y - (posB.y - halfExterns.y);
+        float distBottom = (posB.y + halfExterns.y) - posA.y;
+        float distTop = posA.y - (posB.y - halfExterns.y);
 
-        auto minDist = std::min({distLeft, distRight, distUp, distDown});
+        auto minDist = std::min({distLeft, distRight, distBottom, distTop});
 
         if (minDist == distLeft) {
             m.normal = {1.0f, 0.0f};
         } else if (minDist == distRight) {
             m.normal = {-1.0f, 0.0f};
-        } else if (minDist == distUp) {
+        } else if (minDist == distBottom) {
             m.normal = {0.0f, -1.0f};
         } else {
             m.normal = {0.0, 1.0f};
@@ -114,7 +115,7 @@ bool boxBox(const Body& a, const Body& b, Manifold& m) {
     float overlapY = (ca->halfExtents.y + cb->halfExtents.y) -
                      fabs(a.position.y - b.position.y);
 
-    if (overlapX <= 0 || overlapY < 0) {
+    if (overlapX <= 0 || overlapY <= 0) {
         m.valid = false;
         return false;
     }
@@ -129,7 +130,7 @@ bool boxBox(const Body& a, const Body& b, Manifold& m) {
         m.penetration = overlapY;
     } else {
         m.normal = {1.0f, 0.0f};
-        m.penetration = std::min(overlapY, overlapY);
+        m.penetration = std::min(overlapX, overlapY);
     }
 
      m.contactPoint = (a.position + b.position) * 0.5f;

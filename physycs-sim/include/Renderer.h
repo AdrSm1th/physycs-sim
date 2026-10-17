@@ -33,7 +33,6 @@ class Renderer {
     Vec2 getMouseWorldPos();
     void debugDrawText(float FPS, int bodiesCount, int contatctCount,
                        float energy);
-    bool isMouseLeftPressed() const;
 
    private:
     sf::RenderWindow window;

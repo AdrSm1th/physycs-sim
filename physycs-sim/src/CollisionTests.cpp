@@ -49,7 +49,7 @@ void testCollision() {
 
     box.position.x = 120;
     Collision::circleBox(circle, box, m);
-    assert(m.valid == true && m.penetration < 1e-6);
+    assert(m.valid == false);
 
     circle.position.x = 135;
     circle.position.y = 85;

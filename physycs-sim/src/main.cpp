@@ -60,7 +60,7 @@ int WinMain() {
             Body newBody(aimStartPos, BASE_RADIUS, BASE_MASS, sf::Color::White);
 
             Vec2 dragVec = in.mouseWorldPos - aimStartPos;
-            float power = 5.0f;
+            float power = 2.0f;
 
             newBody.velocity = dragVec * power;
 
@@ -87,9 +87,6 @@ int WinMain() {
         smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
 
         renderer.beginFrame();
-
-        renderer.debugDrawText(smoothedFps, world.bodies.size(),
-                               world.contacts.size(), world.kineticEnergy());
 
         if (isAiming) {
             renderer.drawCircle(aimStartPos, BASE_RADIUS,
@@ -145,6 +142,9 @@ int WinMain() {
                                    sf::Color::Cyan);
             }
         }
+
+        renderer.debugDrawText(smoothedFps, world.bodies.size(),
+                               world.contacts.size(), world.kineticEnergy());
 
         renderer.endFrame();
     }
