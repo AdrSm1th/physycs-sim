@@ -43,11 +43,19 @@ Input Renderer::pollEvent() {
         if (const auto *mousePressed =
                 event->getIf<sf::Event::MouseButtonPressed>()) {
             if (mousePressed->button == sf::Mouse::Button::Left) {
-                in.spawn = true;
+                in.mousePressed = true;
+            }
+        }
+
+        if (const auto *mouseReleased =
+                event->getIf<sf::Event::MouseButtonReleased>()) {
+            if (mouseReleased->button == sf::Mouse::Button::Left) {
+                in.mouseReleased = true;
             }
         }
     }
 
+    in.mouseWorldPos = getMouseWorldPos();
     return in;
 }
 
@@ -119,8 +127,8 @@ Vec2 Renderer::getMouseWorldPos() {
 
 void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
                              float energy) {
-    const float x = 10.0f;
-    const float y = 10.0f;
+    const float x = 30.0f;
+    const float y = 20.0f;
     const float h = 30.0f;
 
     std::string textstr = "FPS: ";
@@ -147,4 +155,8 @@ void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
     text.setString(textstr);
     text.setPosition({x, y + h * 3});
     window.draw(text);
+}
+
+bool Renderer::isMouseLeftPressed() const {
+    return sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
 }

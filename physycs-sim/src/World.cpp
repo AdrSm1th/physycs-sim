@@ -81,12 +81,12 @@ void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
-    bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0, sf::Color::White);
-    bodies.emplace_back(Vec2{640, 0}, Vec2{620, 20}, 0, sf::Color::White);
-    bodies.emplace_back(Vec2{0, 360}, Vec2{20, 360}, 0, sf::Color::White);
-    bodies.emplace_back(Vec2{1280, 360}, Vec2{20, 360}, 0, sf::Color::White);
-    bodies.emplace_back(Vec2{640, 360}, Vec2{100, 100}, 0, sf::Color::White);
-    bodies.emplace_back(Vec2{840, 440}, Vec2{100, 20}, 0, sf::Color::White);
+    bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{640, 0}, Vec2{620, 20}, 0, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{0, 360}, Vec2{20, 360}, 0, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{1280, 360}, Vec2{20, 360}, 0, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{640, 360}, Vec2{100, 100}, 0, sf::Color::Yellow);
+    bodies.emplace_back(Vec2{840, 440}, Vec2{100, 20}, 0, sf::Color::Yellow);
     bodies.emplace_back(Vec2{100, 100}, 50, 5, sf::Color::White);
     bodies.emplace_back(Vec2{300, 100}, 50, 500, sf::Color::White);
 }

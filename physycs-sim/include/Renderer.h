@@ -10,7 +10,10 @@ struct Input {
     bool togglePause = false;
     bool reset = false;
     bool stepOnce = false;
-    bool spawn = false;
+
+    bool mousePressed = false;
+    bool mouseReleased = false;
+    Vec2 mouseWorldPos;
 };
 
 class Renderer {
@@ -30,6 +33,7 @@ class Renderer {
     Vec2 getMouseWorldPos();
     void debugDrawText(float FPS, int bodiesCount, int contatctCount,
                        float energy);
+    bool isMouseLeftPressed() const;
 
    private:
     sf::RenderWindow window;

@@ -33,6 +33,8 @@ int WinMain() {
     bool debugDraw = false;
     bool pause = false;
 
+    bool isAiming = false;  // режим прицеивания при создании тела
+    Vec2 aimStartPos;
     while (renderer.isOpen()) {
         Input in = renderer.pollEvent();
 
@@ -48,15 +50,19 @@ int WinMain() {
             world.reset();
         }
 
-        if (in.spawn) {
-            Vec2 mousePos = renderer.getMouseWorldPos();
-            Body newBody({mousePos.x, mousePos.y}, BASE_RADIUS, BASE_MASS,
-                         sf::Color::White);
+        if (in.mousePressed) {
+            isAiming = true;
+            aimStartPos = in.mouseWorldPos;
+        }
 
-            float angle = (rand() % 360) * 3.14159f / 180.f;
-            float speed = 300.f;
-            newBody.velocity = {std::cos(angle) * speed,
-                                std::sin(angle) * speed};
+        if (in.mouseReleased) {
+            isAiming = false;
+            Body newBody(aimStartPos, BASE_RADIUS, BASE_MASS, sf::Color::White);
+
+            Vec2 dragVec = in.mouseWorldPos - aimStartPos;
+            float power = 5.0f;
+
+            newBody.velocity = dragVec * power;
 
             world.addBody(newBody);
         }
@@ -84,6 +90,13 @@ int WinMain() {
 
         renderer.debugDrawText(smoothedFps, world.bodies.size(),
                                world.contacts.size(), world.kineticEnergy());
+
+        if (isAiming) {
+            renderer.drawCircle(aimStartPos, BASE_RADIUS,
+                                sf::Color(255, 255, 255, 100));
+            renderer.drawArrow(aimStartPos, in.mouseWorldPos, 15.f,
+                               sf::Color::Green);
+        }
 
         for (Body &body : world.bodies) {
             std::visit(
