@@ -6,25 +6,48 @@
 #include "Body.h"
 #include "Collision.h"
 
-constexpr float SLOP = 0.01f;  // защита от дрожани€ (когда тело будет сто€ть на
+constexpr float SLOP = 0.5f;  // защита от дрожани€ (когда тело будет сто€ть на
                                // полу, без этого параметра будет дрожание)
 constexpr float CORRECTION_PERCENT =
-    0.8f;  // — этим параметром выталкивание будет более плавным. Ќужно дл€
+    0.3f;  // — этим параметром выталкивание будет более плавным. Ќужно дл€
            // столкновени€ большого количества тел, чтобы не создавать лишних
            // коллизий
 
 constexpr int ITERATIONS = 10;  // ƒл€ корректного разрешени€ столкновени€
                                 // цепочки тел нужно несколько итераций
 
+constexpr float MIN_FEATURE_SIZE = 10.0f;
+constexpr int MAX_SUBSTEPS = 30;
+
 void World::addBody(const Body& b) { bodies.push_back(b); }
 
 void World::step(float dt) {
+    float maxSpeed = 0.0f;
+    for (Body& b : bodies) {
+        maxSpeed = std::max(maxSpeed, b.velocity.length());
+    }
+
+    float maxPath = maxSpeed * dt;
+    int k = 1;
+    if (maxPath > MIN_FEATURE_SIZE) {
+        k = static_cast<int>(ceil(maxPath / MIN_FEATURE_SIZE));
+        k = std::min(k, MAX_SUBSTEPS);
+    }
+
+    float subDt = dt / static_cast<float>(k);
+    for (int i = 0; i < k; i++) {
+        stepInternal(subDt);
+    }
+}
+
+void World::stepInternal(float dt) {
     for (Body& b : bodies) {
         b.applyForce(gravity * b.mass);
         b.integrate(dt);
     }
 
     contacts.clear();
+
     for (int i = 0; i < bodies.size(); i++) {
         for (int j = i + 1; j < bodies.size(); j++) {
             Manifold m;
@@ -37,7 +60,7 @@ void World::step(float dt) {
                 m.b = j;
                 contacts.push_back(m);
             } else if ((ca && bb || cb && ba) &&
-                           Collision::circleBox(bodies[i], bodies[j], m)) {
+                       Collision::circleBox(bodies[i], bodies[j], m)) {
                 m.a = i;
                 m.b = j;
                 contacts.push_back(m);
@@ -81,14 +104,55 @@ void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
-    bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{640, 0}, Vec2{620, 20}, 0, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{0, 360}, Vec2{20, 360}, 0, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{1280, 360}, Vec2{20, 360}, 0, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{640, 360}, Vec2{100, 100}, 0, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{840, 440}, Vec2{100, 20}, 0, sf::Color::Yellow);
-    bodies.emplace_back(Vec2{100, 100}, 50, 5, sf::Color::White);
-    bodies.emplace_back(Vec2{300, 100}, 50, 500, sf::Color::White);
+    bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0,
+                        sf::Color(80, 80, 80));
+    bodies.emplace_back(Vec2{640, 10}, Vec2{620, 20}, 0, sf::Color(80, 80, 80));
+    bodies.emplace_back(Vec2{10, 360}, Vec2{20, 360}, 0, sf::Color(80, 80, 80));
+    bodies.emplace_back(Vec2{1270, 360}, Vec2{20, 360}, 0,
+                        sf::Color(80, 80, 80));
+
+    // “онка€ стена дл€ теста туннелировани€ (6 px толщиной)
+    bodies.emplace_back(Vec2{800, 360}, Vec2{3, 150}, 0,
+                        sf::Color(150, 150, 150));
+
+    const float R = 25.f;
+    const float rowH = R * 1.7320508f;
+
+    // “ест 1: пирамида из 10 шаров
+    //{
+    //    const float baseY = 665.f;
+    //    const float baseX = 400.f;
+    //    for (int row = 0; row < 4; row++) {
+    //        int count = 4 - row;
+    //        float y = baseY - row * rowH;
+    //        float x = baseX + row * R;
+    //        for (int i = 0; i < count; i++) {
+    //            Body ball(Vec2{x, y}, R, 5.f, sf::Color(220, 220, 255));
+    //            ball.restitution = 0.0f;
+    //            bodies.push_back(ball);
+    //        }
+    //    }
+    //}
+
+    // “ест 2 : вертикальна€ колонна из 5 шаров
+
+    //for (int i = 0; i < 5; i++) {
+    //    bodies.emplace_back(Vec2{950.f, 665.f - 50.f * i}, R, 5.f,
+    //                        sf::Color(100, 200, 255));
+    //}
+
+    // “ест 3: быстро лет€щие тела
+    {
+        Body fastA(Vec2{230, 300}, 15, 1, sf::Color::Red);
+        fastA.velocity = {5000.f, 0.f};
+        bodies.push_back(fastA);
+        Body fastB(Vec2{250, 420}, 15, 1, sf::Color(255, 100, 100));
+        fastB.velocity = {5000.f, 0.f};
+        bodies.push_back(fastB);
+    }
+
+    // “ест 4: эталон Ч свободное падение ---
+    //bodies.emplace_back(Vec2{1150, 100}, 20, 5, sf::Color(255, 200, 100));
 }
 
 void World::resolveContact(const Manifold& contact) {
