@@ -72,13 +72,18 @@ int WinMain() {
 
         if (!pause) {
             accumulator += frameDt;
+
             int steps = 0;
-            while (accumulator >= FIXED_DT) {
+            while (accumulator >= FIXED_DT && steps < MAX_STEPS) {
                 world.step(FIXED_DT);
                 accumulator -= FIXED_DT;
-                steps++;
+                ++steps;
             }
-            if (steps >= MAX_STEPS) accumulator = 0.f;
+
+            if (steps >= MAX_STEPS) {
+                accumulator = std::fmod(accumulator, FIXED_DT);
+            }
+
         } else if (in.stepOnce) {
             world.step(FIXED_DT);
         }

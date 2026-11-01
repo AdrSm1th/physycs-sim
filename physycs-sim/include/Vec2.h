@@ -44,7 +44,8 @@ struct Vec2 {
 
     bool operator==(const Vec2 &other) const {
         constexpr float eps = 1e-5f;
-        float scale = std::max({1.f, x, y, other.x, other.y});
+        float scale =
+            std::max({1.f, fabs(x), fabs(y), fabs(other.x), fabs(other.y)});
         float tol = eps * scale;
         return fabs(x - other.x) <= tol && fabs(y - other.y) <= tol;
     }

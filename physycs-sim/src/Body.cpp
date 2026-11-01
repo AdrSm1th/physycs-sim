@@ -24,8 +24,11 @@ Body::Body(Vec2 pos, Vec2 halfExtents, float mass, sf::Color color) {
 
 void Body::applyForce(Vec2 f) { acceleration += f * invMass; }
 
-void Body::integrate(float dt) {
-    velocity += acceleration * dt;
+void Body::integrate(float dt, Vec2 gravity) {
+    if (invMass == 0.0f) {
+        return;
+    }
+
+    velocity += (acceleration + gravity) * dt;
     position += velocity * dt;
-    acceleration = {0, 0};
 }

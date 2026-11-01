@@ -38,12 +38,15 @@ void World::step(float dt) {
     for (int i = 0; i < k; i++) {
         stepInternal(subDt);
     }
+
+    for (Body& b : bodies) {
+        b.acceleration = {0.0f, 0.0f};
+    }
 }
 
 void World::stepInternal(float dt) {
     for (Body& b : bodies) {
-        b.applyForce(gravity * b.mass);
-        b.integrate(dt);
+        b.integrate(dt, gravity);
     }
 
     contacts.clear();
@@ -104,6 +107,8 @@ void World::reset() { setupScene(); }
 
 void World::setupScene() {
     bodies.clear();
+    contacts.clear();
+
     bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0,
                         sf::Color(80, 80, 80));
     bodies.emplace_back(Vec2{640, 10}, Vec2{620, 20}, 0, sf::Color(80, 80, 80));
@@ -153,6 +158,9 @@ void World::setupScene() {
 
     // Тест 4: эталон — свободное падение ---
     //bodies.emplace_back(Vec2{1150, 100}, 20, 5, sf::Color(255, 200, 100));
+
+    bodies.emplace_back(Vec2{30, 30}, Vec2{10, 10}, 5, sf::Color::Red);
+    bodies.emplace_back(Vec2{45, 45}, Vec2{10, 10}, 5, sf::Color::Red);
 }
 
 void World::resolveContact(const Manifold& contact) {

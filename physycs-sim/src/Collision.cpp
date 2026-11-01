@@ -120,7 +120,7 @@ bool boxBox(const Body& a, const Body& b, Manifold& m) {
         return false;
     }
 
-    if (overlapX < overlapY) {
+    if (overlapX <= overlapY) {
         m.normal = b.position.x - a.position.x >= 0 ? Vec2{1.0f, 0.0f}
                                                    : Vec2{-1.0f, 0.0f};
         m.penetration = overlapX;
@@ -128,12 +128,9 @@ bool boxBox(const Body& a, const Body& b, Manifold& m) {
         m.normal = b.position.y - a.position.y >= 0 ? Vec2{0.0f, 1.0f}
                                                    : Vec2{0.0f, -1.0f};
         m.penetration = overlapY;
-    } else {
-        m.normal = {1.0f, 0.0f};
-        m.penetration = std::min(overlapX, overlapY);
     }
-
-     m.contactPoint = (a.position + b.position) * 0.5f;
+    
+    m.contactPoint = (a.position + b.position) * 0.5f;
     m.valid = true;
     return true;
 }

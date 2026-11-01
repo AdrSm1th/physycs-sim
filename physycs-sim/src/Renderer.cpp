@@ -150,9 +150,9 @@ void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
     text.setPosition({x, y + h * 2});
     window.draw(text);
 
-    textstr = "Energy: ";
-    textstr += std::to_string(energy);
-    text.setString(textstr);
-    text.setPosition({x, y + h * 3});
-    window.draw(text);
+    //textstr = "Energy: ";
+    //textstr += std::to_string(energy);
+    //text.setString(textstr);
+    //text.setPosition({x, y + h * 3});
+    //window.draw(text);
 }
