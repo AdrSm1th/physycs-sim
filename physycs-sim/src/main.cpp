@@ -1,3 +1,6 @@
+#include <imgui-SFML.h>
+#include <imgui.h>
+
 #include <SFML/Graphics.hpp>
 #include <algorithm>
 #include <variant>
@@ -50,24 +53,33 @@ int WinMain() {
             world.reset();
         }
 
-        if (in.mousePressed) {
+        const bool canUseScene = renderer.isMouseInScene();
+
+        if (in.mousePressed && canUseScene) {
             isAiming = true;
             aimStartPos = in.mouseWorldPos;
         }
 
         if (in.mouseReleased) {
+            if (isAiming && canUseScene) {
+                Body newBody(aimStartPos, BASE_RADIUS, BASE_MASS,
+                             sf::Color::White);
+
+                const Vec2 dragVec = in.mouseWorldPos - aimStartPos;
+                newBody.velocity = dragVec * 2.0f;
+
+                world.addBody(newBody);
+            }
+
             isAiming = false;
-            Body newBody(aimStartPos, BASE_RADIUS, BASE_MASS, sf::Color::White);
-
-            Vec2 dragVec = in.mouseWorldPos - aimStartPos;
-            float power = 2.0f;
-
-            newBody.velocity = dragVec * power;
-
-            world.addBody(newBody);
         }
 
-        float frameDt = clock.restart().asSeconds();
+        sf::Time elapsed = clock.restart();
+        if (elapsed.asMicroseconds() <= 0) {
+            elapsed = sf::microseconds(1);
+        }
+
+        float frameDt = std::min(elapsed.asSeconds(), 0.25f);
         if (frameDt > 0.25f) frameDt = 0.25f;
 
         if (!pause) {
@@ -91,7 +103,9 @@ int WinMain() {
         float instantFps = 1.f / frameDt;
         smoothedFps = smoothedFps * 0.9f + instantFps * 0.1f;
 
-        renderer.beginFrame();
+        renderer.beginFrame(elapsed);
+
+        renderer.drawImGuiPanel(pause, debugDraw, world);
 
         if (isAiming) {
             renderer.drawCircle(aimStartPos, BASE_RADIUS,
