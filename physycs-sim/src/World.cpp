@@ -109,11 +109,11 @@ void World::setupScene() {
     bodies.clear();
     contacts.clear();
 
-    bodies.emplace_back(Vec2{640, 710}, Vec2{620, 20}, 0,
+    bodies.emplace_back(Vec2{640, 720}, Vec2{620, 20}, 0,
                         sf::Color(80, 80, 80));
-    bodies.emplace_back(Vec2{640, 10}, Vec2{620, 20}, 0, sf::Color(80, 80, 80));
-    bodies.emplace_back(Vec2{10, 360}, Vec2{20, 360}, 0, sf::Color(80, 80, 80));
-    bodies.emplace_back(Vec2{1270, 360}, Vec2{20, 360}, 0,
+    bodies.emplace_back(Vec2{640, 0}, Vec2{620, 20}, 0, sf::Color(80, 80, 80));
+    bodies.emplace_back(Vec2{0, 360}, Vec2{20, 360}, 0, sf::Color(80, 80, 80));
+    bodies.emplace_back(Vec2{1280, 360}, Vec2{20, 360}, 0,
                         sf::Color(80, 80, 80));
 
     // Тонкая стена для теста туннелирования (6 px толщиной)

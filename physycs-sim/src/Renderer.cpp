@@ -1,7 +1,10 @@
 #include "Renderer.h"
 
 #include <imgui-SFML.h>
+#include <SFML/OpenGL.hpp>
 #include <imgui.h>
+#include <cassert>
+
 #include <algorithm>
 
 Renderer::Renderer(unsigned int width, unsigned int height,
@@ -13,10 +16,13 @@ Renderer::Renderer(unsigned int width, unsigned int height,
         throw std::runtime_error("ImGui initialization failed");
     }
 
-    ImGuiIO &io = ImGui::GetIO();
-    if (io.Fonts->Fonts.Size == 0) {
-        io.Fonts->AddFontDefault();
-    }
+    assert(ImGui::GetCurrentContext() != nullptr &&
+           "Context missing immediately after Init");
+
+    //ImGuiIO &io = ImGui::GetIO();
+    //if (io.Fonts->Fonts.Size == 0) {
+    //    io.Fonts->AddFontDefault();
+    //}
 
     if (!font.openFromFile("assets/Insight Sans SSi.ttf")) {
         throw std::runtime_error("Font not loaded");
@@ -186,7 +192,8 @@ void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
     window.draw(text);
 }
 
-void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world) {
+void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
+                              float fixedDt) {
     const ImVec2 windowSize = ImGui::GetIO().DisplaySize;
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
@@ -203,6 +210,12 @@ void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world) {
 
         if (ImGui::Button(pause ? "Continue" : "Pause")) {
             pause = !pause;
+        }
+
+        if (pause) {
+            if (ImGui::Button("Step")) {
+                world.step(fixedDt);
+            }
         }
 
         ImGui::Checkbox("Debug draw", &debugDraw);

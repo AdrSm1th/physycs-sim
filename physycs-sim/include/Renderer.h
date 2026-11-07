@@ -36,7 +36,8 @@ class Renderer {
     Vec2 getMouseWorldPos();
     void debugDrawText(float FPS, int bodiesCount, int contatctCount,
                        float energy);
-    void drawImGuiPanel(bool &pause, bool &debugDraw, World &world);
+    void drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
+                        float fixedDt);
     bool isMouseInScene() const;
 
    private:

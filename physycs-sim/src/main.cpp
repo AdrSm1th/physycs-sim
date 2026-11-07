@@ -105,7 +105,7 @@ int WinMain() {
 
         renderer.beginFrame(elapsed);
 
-        renderer.drawImGuiPanel(pause, debugDraw, world);
+        renderer.drawImGuiPanel(pause, debugDraw, world, frameDt);
 
         if (isAiming) {
             renderer.drawCircle(aimStartPos, BASE_RADIUS,

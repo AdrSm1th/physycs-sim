@@ -1,0 +1,21 @@
+{
+  "name": "physycs-sim",
+  "version-string": "0.1.0",
+  "builtin-baseline": "a1cae005c39be7b18ba319fced856b68d7276271",
+  "dependencies": [
+    "sfml",
+    "imgui-sfml"
+  ],
+  "overrides": [
+    {
+      "name": "imgui",
+      "version": "1.91.9",
+      "port-version": 0
+    },
+    {
+      "name": "imgui-sfml",
+      "version": "3.0",
+      "port-version": 2
+    }
+  ]
+}
