@@ -68,12 +68,6 @@
   (Desktop development with C++), MSVC v143 и Windows SDK.
 - vcpkg.
 
-### Шаги
-
-1. Клонировать репозиторий:
-
-git clone https://github.com/AdrSm1th/physycs-sim.git
-
 ### 1. Подготовить vcpkg
 
 Если vcpkg ещё не установлен, выполните в PowerShell:
