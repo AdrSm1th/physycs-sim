@@ -30,4 +30,5 @@ struct Body {
     Body(Vec2 pos, Vec2 halfExtents, float mass, sf::Color color);
     void applyForce(Vec2 f);
     void integrate(float dt, Vec2 gravity = {});
+    void setMass(float newMass);
 };

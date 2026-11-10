@@ -1,15 +1,17 @@
 #include "Renderer.h"
 
 #include <imgui-SFML.h>
-#include <SFML/OpenGL.hpp>
 #include <imgui.h>
-#include <cassert>
 
+#include <SFML/OpenGL.hpp>
 #include <algorithm>
+#include <variant>
 
 Renderer::Renderer(unsigned int width, unsigned int height,
                    const std::string &title, unsigned int fpsLimit)
-    : font(), window(sf::VideoMode({width, height}), title) {
+    : font(),
+      window(sf::VideoMode({width, height}), title),
+      bodyForCreate({0, 0}, 40.0f, 10.0f, sf::Color::White) {
     window.setFramerateLimit(fpsLimit);
 
     if (!ImGui::SFML::Init(window)) {
@@ -19,14 +21,17 @@ Renderer::Renderer(unsigned int width, unsigned int height,
     assert(ImGui::GetCurrentContext() != nullptr &&
            "Context missing immediately after Init");
 
-    //ImGuiIO &io = ImGui::GetIO();
-    //if (io.Fonts->Fonts.Size == 0) {
-    //    io.Fonts->AddFontDefault();
-    //}
-
     if (!font.openFromFile("assets/Insight Sans SSi.ttf")) {
         throw std::runtime_error("Font not loaded");
     }
+
+    // mass = 10.0f;
+    // color[0] = 1;
+    // color[1] = 1;
+    // color[2] = 2;
+    // radius = 0;
+    // height = 0.0f;
+    // width = 0.0f;
 }
 
 Renderer::~Renderer() { ImGui::SFML::Shutdown(); }
@@ -205,8 +210,7 @@ void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
 
     if (ImGui::Begin("Simulation", nullptr, flags)) {
-        ImGui::Text("Simulation");
-        ImGui::Separator();
+        ImGui::Text("Scene settings");
 
         if (ImGui::Button(pause ? "Continue" : "Pause")) {
             pause = !pause;
@@ -221,6 +225,55 @@ void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
         ImGui::Checkbox("Debug draw", &debugDraw);
 
         ImGui::SliderFloat("Gravity Y", &world.gravity.y, -1000.0f, 1000.0f);
+
+        ImGui::Separator();
+
+        ImGui::Text("Bodies");
+
+        if (ImGui::Button("Circle")) {
+            selected = true;
+            shapeId = 0;
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Box")) {
+            selected = true;
+            shapeId = 1;
+        }
+
+        if (selected) {
+            ImGui::InputFloat("Mass", &mass, 1.0f, 5.0f, "%.00f");
+            mass = std::max(0.0f, mass);
+
+            ImGui::ColorEdit3("Body color", color);
+
+            if (shapeId == 0) {
+                ImGui::InputFloat("Radius", &radius, 1.0f, 5.0f, "%.0f");
+                radius = std::max(1.0f, radius);
+
+                bodyForCreate.shape = CircleShape(radius);
+            } else if (shapeId == 1) {
+                ImGui::InputFloat("Height", &height, 1.0f, 5.0f, "%.0f");
+                height = std::max(1.0f, height);
+
+                ImGui::Separator();
+
+                ImGui::InputFloat("Width", &width, 1.0f, 5.0f, "%.0f");
+                width = std::max(1.0f, width);
+
+                bodyForCreate.shape = BoxShape({width / 2.0f, height / 2.0f});
+            }
+
+            //bodyForCreate.position = pos;
+            bodyForCreate.setMass(mass);
+            bodyForCreate.color.r =
+                static_cast<std::uint8_t>(color[0] * 255.0f);
+            bodyForCreate.color.g =
+                static_cast<std::uint8_t>(color[1] * 255.0f);
+            bodyForCreate.color.b =
+                static_cast<std::uint8_t>(color[2] * 255.0f);
+        }
     }
     ImGui::End();
 }
@@ -259,3 +312,7 @@ bool Renderer::isMouseInScene() const {
     return pos.x >= PANEL_WIDTH && pos.x < static_cast<int>(size.x) &&
            pos.y >= 0 && pos.y < static_cast<int>(size.y);
 }
+
+Body Renderer::GetBodyForCreate() const { return bodyForCreate; }
+
+bool Renderer::IsSelect() const { return selected; }

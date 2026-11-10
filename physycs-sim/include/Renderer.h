@@ -39,10 +39,22 @@ class Renderer {
     void drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
                         float fixedDt);
     bool isMouseInScene() const;
+    Body GetBodyForCreate() const;
+    bool IsSelect() const;
 
    private:
     sf::View sceneView;
     sf::RenderWindow window;
     sf::Font font;
+    Body bodyForCreate;
+    bool selected = false;
+    int shapeId = 0;
+
+    float mass = 10.0f;
+    float color[3] = {1, 1, 1};
+    float radius = 40.0f;
+    float height = 40.0f;
+    float width = 60.0f;
+
     void updateSceneView();
 };

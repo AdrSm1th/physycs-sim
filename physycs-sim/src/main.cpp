@@ -29,8 +29,6 @@ int WinMain() {
 
     const float FIXED_DT = 1.0f / 120.0f;  // 120 √ц физика
     const int MAX_STEPS = 5;
-    const float BASE_RADIUS = 40.0f;
-    const float BASE_MASS = 10.0f;
     float accumulator = 0.f;
 
     bool debugDraw = false;
@@ -55,15 +53,15 @@ int WinMain() {
 
         const bool canUseScene = renderer.isMouseInScene();
 
-        if (in.mousePressed && canUseScene) {
+        if (in.mousePressed && canUseScene && renderer.IsSelect()) {
             isAiming = true;
             aimStartPos = in.mouseWorldPos;
         }
 
         if (in.mouseReleased) {
             if (isAiming && canUseScene) {
-                Body newBody(aimStartPos, BASE_RADIUS, BASE_MASS,
-                             sf::Color::White);
+                Body newBody = renderer.GetBodyForCreate(); 
+                newBody.position = aimStartPos;
 
                 const Vec2 dragVec = in.mouseWorldPos - aimStartPos;
                 newBody.velocity = dragVec * 2.0f;
@@ -105,11 +103,22 @@ int WinMain() {
 
         renderer.beginFrame(elapsed);
 
-        renderer.drawImGuiPanel(pause, debugDraw, world, frameDt);
+        renderer.drawImGuiPanel(pause, debugDraw, world, FIXED_DT);
 
         if (isAiming) {
-            renderer.drawCircle(aimStartPos, BASE_RADIUS,
-                                sf::Color(255, 255, 255, 100));
+            Body newBody = renderer.GetBodyForCreate();
+
+            auto *c = std::get_if<CircleShape>(&newBody.shape);
+            auto *b = std::get_if<BoxShape>(&newBody.shape);
+
+            if (c) {
+                renderer.drawCircle(aimStartPos,
+                                    c->radius,
+                                    newBody.color);
+            } else if (b) {
+                renderer.drawBox(aimStartPos, b->halfExtents, newBody.color);
+            }
+
             renderer.drawArrow(aimStartPos, in.mouseWorldPos, 15.f,
                                sf::Color::Green);
         }

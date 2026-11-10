@@ -32,3 +32,8 @@ void Body::integrate(float dt, Vec2 gravity) {
     velocity += (acceleration + gravity) * dt;
     position += velocity * dt;
 }
+
+void Body::setMass(float newMass) {
+    mass = newMass;
+    invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
+}
