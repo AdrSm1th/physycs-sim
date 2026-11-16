@@ -26,6 +26,7 @@ struct Body {
     float friction;
     sf::Color color;
 
+    Body();
     Body(Vec2 pos, float radius, float mass, sf::Color color);
     Body(Vec2 pos, Vec2 halfExtents, float mass, sf::Color color);
     Body(Vec2 pos, float radius, float mass, float friction, sf::Color color);

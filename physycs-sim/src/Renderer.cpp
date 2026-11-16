@@ -9,9 +9,7 @@
 
 Renderer::Renderer(unsigned int width, unsigned int height,
                    const std::string &title, unsigned int fpsLimit)
-    : font(),
-      window(sf::VideoMode({width, height}), title),
-      bodyForCreate({0, 0}, 40.0f, 10.0f, sf::Color::White) {
+    : font(), window(sf::VideoMode({width, height}), title) {
     window.setFramerateLimit(fpsLimit);
 
     if (!ImGui::SFML::Init(window)) {
@@ -24,14 +22,6 @@ Renderer::Renderer(unsigned int width, unsigned int height,
     if (!font.openFromFile("assets/Insight Sans SSi.ttf")) {
         throw std::runtime_error("Font not loaded");
     }
-
-    // mass = 10.0f;
-    // color[0] = 1;
-    // color[1] = 1;
-    // color[2] = 2;
-    // radius = 0;
-    // height = 0.0f;
-    // width = 0.0f;
 }
 
 Renderer::~Renderer() { ImGui::SFML::Shutdown(); }
@@ -243,36 +233,41 @@ void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
         }
 
         if (selected) {
-            ImGui::InputFloat("Mass", &mass, 1.0f, 5.0f, "%.00f");
-            mass = std::max(0.0f, mass);
+            ImGui::InputFloat("Mass", &bodyForCreate.mass, 1.0f, 5.0f, "%.2f");
+            bodyForCreate.mass = std::max(0.0f, bodyForCreate.mass);
 
-            ImGui::ColorEdit3("Body color", color);
+            ImGui::ColorEdit3("Body color", bodyForCreate.color);
+
+            ImGui::InputFloat("Restitution", &bodyForCreate.restitution, 0.01f,
+                              0.1f, "%.2f");
+            bodyForCreate.restitution =
+                std::clamp(bodyForCreate.restitution, 0.0f, 1.0f);
+
+            ImGui::InputFloat("Friction", &bodyForCreate.friction, 0.01f, 0.1f,
+                              "%.2f");
+            bodyForCreate.friction =
+                std::clamp(bodyForCreate.friction, 0.0f, 1.0f);
 
             if (shapeId == 0) {
-                ImGui::InputFloat("Radius", &radius, 1.0f, 5.0f, "%.0f");
-                radius = std::max(1.0f, radius);
+                ImGui::InputFloat("Radius", &bodyForCreate.radius, 1.0f, 5.0f,
+                                  "%.1f");
+                bodyForCreate.radius = std::max(1.0f, bodyForCreate.radius);
 
-                bodyForCreate.shape = CircleShape(radius);
+                bodyForCreate.shape = CircleShape(bodyForCreate.radius);
             } else if (shapeId == 1) {
-                ImGui::InputFloat("Height", &height, 1.0f, 5.0f, "%.0f");
-                height = std::max(1.0f, height);
+                ImGui::InputFloat("Height", &bodyForCreate.height, 1.0f, 5.0f,
+                                  "%.1f");
+                bodyForCreate.height = std::max(1.0f, bodyForCreate.height);
 
                 ImGui::Separator();
 
-                ImGui::InputFloat("Width", &width, 1.0f, 5.0f, "%.0f");
-                width = std::max(1.0f, width);
+                ImGui::InputFloat("Width", &bodyForCreate.width, 1.0f, 5.0f,
+                                  "%.1f");
+                bodyForCreate.width = std::max(1.0f, bodyForCreate.width);
 
-                bodyForCreate.shape = BoxShape({width / 2.0f, height / 2.0f});
+                bodyForCreate.shape = BoxShape(
+                    {bodyForCreate.width / 2.0f, bodyForCreate.height / 2.0f});
             }
-
-            //bodyForCreate.position = pos;
-            bodyForCreate.setMass(mass);
-            bodyForCreate.color.r =
-                static_cast<std::uint8_t>(color[0] * 255.0f);
-            bodyForCreate.color.g =
-                static_cast<std::uint8_t>(color[1] * 255.0f);
-            bodyForCreate.color.b =
-                static_cast<std::uint8_t>(color[2] * 255.0f);
         }
     }
     ImGui::End();
@@ -313,6 +308,17 @@ bool Renderer::isMouseInScene() const {
            pos.y >= 0 && pos.y < static_cast<int>(size.y);
 }
 
-Body Renderer::GetBodyForCreate() const { return bodyForCreate; }
+Body Renderer::GetBodyForCreate() const {
+    Body body;
+    body.shape = bodyForCreate.shape;
+    body.setMass(bodyForCreate.mass);
+    body.restitution = bodyForCreate.restitution;
+    body.friction = bodyForCreate.friction;
+    body.color.r = static_cast<std::uint8_t>(bodyForCreate.color[0] * 255.0f);
+    body.color.g = static_cast<std::uint8_t>(bodyForCreate.color[1] * 255.0f);
+    body.color.b = static_cast<std::uint8_t>(bodyForCreate.color[2] * 255.0f);
+
+    return body;
+}
 
 bool Renderer::IsSelect() const { return selected; }

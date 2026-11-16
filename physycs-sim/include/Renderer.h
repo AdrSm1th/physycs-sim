@@ -17,6 +17,17 @@ struct Input {
     Vec2 mouseWorldPos;
 };
 
+struct BodyForCreate {
+    float mass = 10.0f;
+    float color[3] = {1, 1, 1};
+    float radius = 40.0f;
+    float height = 40.0f;
+    float width = 60.0f;
+    float restitution = 0.5f;
+    float friction = 0.5f;
+    Shape shape = CircleShape(radius);
+};
+
 class Renderer {
    public:
     static constexpr float PANEL_WIDTH = 250.0f;
@@ -46,15 +57,9 @@ class Renderer {
     sf::View sceneView;
     sf::RenderWindow window;
     sf::Font font;
-    Body bodyForCreate;
+    BodyForCreate bodyForCreate;
     bool selected = false;
     int shapeId = 0;
-
-    float mass = 10.0f;
-    float color[3] = {1, 1, 1};
-    float radius = 40.0f;
-    float height = 40.0f;
-    float width = 60.0f;
 
     void updateSceneView();
 };
