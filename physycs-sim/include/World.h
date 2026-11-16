@@ -14,7 +14,7 @@ struct World {
     void step(float dt);
     void reset();
     void setupScene();
-    void resolveContact(const Manifold& contact);
+    void resolveContact(Manifold& contact);
     float kineticEnergy() const;
 
     private:

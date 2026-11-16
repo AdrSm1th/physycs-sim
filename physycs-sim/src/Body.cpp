@@ -4,6 +4,7 @@ Body::Body(Vec2 pos, float radius, float mass, sf::Color color) {
     position = pos;
     this->mass = mass;
     invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
+    this->friction = 0.5f;
     velocity = Vec2(0, 0);
     acceleration = Vec2(0, 0);
     restitution = 0.5f;  // ”пругость по умолчанию
@@ -15,6 +16,33 @@ Body::Body(Vec2 pos, Vec2 halfExtents, float mass, sf::Color color) {
     position = pos;
     this->mass = mass;
     invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
+    this->friction = 0.5f;
+    velocity = Vec2(0, 0);
+    acceleration = Vec2(0, 0);
+    restitution = 0.5f;  // ”пругость по умолчанию
+    this->color = color;
+    shape = BoxShape({halfExtents});
+}
+
+Body::Body(Vec2 pos, float radius, float mass, float friction,
+           sf::Color color) {
+    position = pos;
+    this->mass = mass;
+    invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
+    this->friction = friction;
+    velocity = Vec2(0, 0);
+    acceleration = Vec2(0, 0);
+    restitution = 0.5f;  // ”пругость по умолчанию
+    this->color = color;
+    shape = CircleShape({radius});
+}
+
+Body::Body(Vec2 pos, Vec2 halfExtents, float mass, float friction,
+           sf::Color color) {
+    position = pos;
+    this->mass = mass;
+    invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
+    this->friction = friction;
     velocity = Vec2(0, 0);
     acceleration = Vec2(0, 0);
     restitution = 0.5f;  // ”пругость по умолчанию

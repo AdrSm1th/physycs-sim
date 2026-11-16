@@ -7,7 +7,7 @@
 #include "Collision.h"
 
 constexpr float SLOP = 0.5f;  // защита от дрожания (когда тело будет стоять на
-                               // полу, без этого параметра будет дрожание)
+                              // полу, без этого параметра будет дрожание)
 constexpr float CORRECTION_PERCENT =
     0.3f;  // С этим параметром выталкивание будет более плавным. Нужно для
            // столкновения большого количества тел, чтобы не создавать лишних
@@ -18,6 +18,8 @@ constexpr int ITERATIONS = 10;  // Для корректного разрешения столкновения
 
 constexpr float MIN_FEATURE_SIZE = 10.0f;
 constexpr int MAX_SUBSTEPS = 30;
+
+constexpr float V_THRESHOLD = 10.0f;
 
 void World::addBody(const Body& b) { bodies.push_back(b); }
 
@@ -61,22 +63,36 @@ void World::stepInternal(float dt) {
             if (ca && cb && Collision::circleCircle(bodies[i], bodies[j], m)) {
                 m.a = i;
                 m.b = j;
+                m.computeTangent();
                 contacts.push_back(m);
             } else if ((ca && bb || cb && ba) &&
                        Collision::circleBox(bodies[i], bodies[j], m)) {
                 m.a = i;
                 m.b = j;
+                m.computeTangent();
                 contacts.push_back(m);
             } else if (ba && bb && Collision::boxBox(bodies[i], bodies[j], m)) {
                 m.a = i;
                 m.b = j;
+                m.computeTangent();
                 contacts.push_back(m);
             }
         }
     }
 
+    for (Manifold& contact : contacts) {
+        const Body& a = bodies[contact.a];
+        const Body& b = bodies[contact.b];
+
+        float initialVn = contact.normal.dot(b.velocity - a.velocity);
+        float restitution = std::min(a.restitution, b.restitution);
+
+        contact.targetNormalVelocity =
+            initialVn < -V_THRESHOLD ? -restitution * initialVn : 0.0f;
+    }
+
     for (int i = 0; i < ITERATIONS; i++) {
-        for (const Manifold& contact : contacts) {
+        for (Manifold& contact : contacts) {
             resolveContact(contact);
         }
         // resolveContact(contact);
@@ -141,10 +157,10 @@ void World::setupScene() {
 
     // Тест 2 : вертикальная колонна из 5 шаров
 
-    //for (int i = 0; i < 5; i++) {
-    //    bodies.emplace_back(Vec2{950.f, 665.f - 50.f * i}, R, 5.f,
-    //                        sf::Color(100, 200, 255));
-    //}
+    // for (int i = 0; i < 5; i++) {
+    //     bodies.emplace_back(Vec2{950.f, 665.f - 50.f * i}, R, 5.f,
+    //                         sf::Color(100, 200, 255));
+    // }
 
     // Тест 3: быстро летящие тела
     {
@@ -157,35 +173,55 @@ void World::setupScene() {
     }
 
     // Тест 4: эталон — свободное падение ---
-    //bodies.emplace_back(Vec2{1150, 100}, 20, 5, sf::Color(255, 200, 100));
+    // bodies.emplace_back(Vec2{1150, 100}, 20, 5, sf::Color(255, 200, 100));
 
     bodies.emplace_back(Vec2{30, 30}, Vec2{10, 10}, 5, sf::Color::Red);
     bodies.emplace_back(Vec2{45, 45}, Vec2{10, 10}, 5, sf::Color::Red);
 }
 
-void World::resolveContact(const Manifold& contact) {
+void World::resolveContact(Manifold& contact) {
     Body& a = bodies[contact.a];
     Body& b = bodies[contact.b];
-    float vRel = contact.normal.dot(b.velocity - a.velocity);
+    Vec2 vRel = b.velocity - a.velocity;
+    float vn = contact.normal.dot(vRel);
+    float k = a.invMass + b.invMass;
 
-    if (vRel >= 0) {
+    if (k == 0) {
         return;
     }
 
-    // Выбор минимальной упругости
-    float restitution = std::min(a.restitution, b.restitution);
+    float deltaNormalImpulse = (contact.targetNormalVelocity - vn) / k;
+    float oldNI = contact.normalImpulse;
+    float newNI = std::max(0.0f, oldNI + deltaNormalImpulse);
+    deltaNormalImpulse = newNI - oldNI;
+    contact.normalImpulse = newNI;
 
-    float pulse = -(1 + restitution) * vRel / (a.invMass + b.invMass);
+    a.velocity -= contact.normal * deltaNormalImpulse * a.invMass;
+    b.velocity += contact.normal * deltaNormalImpulse * b.invMass;
 
-    a.velocity -= contact.normal * (pulse * a.invMass);
-    b.velocity += contact.normal * (pulse * b.invMass);
+    vRel = b.velocity - a.velocity;
+    float vt = contact.tangent.dot(vRel);
+
+    float friction = sqrt(a.friction * b.friction);
+
+    float deltaTangentImpulse = -vt / k;
+    float oldTI = contact.tangentImpulse;
+    float L = friction * contact.normalImpulse;
+    float newTI = std::clamp(oldTI + deltaTangentImpulse, -L, L);
+    deltaTangentImpulse = newTI - oldTI;
+    contact.tangentImpulse = newTI;
+
+    // float pulse = -(1 + restitution) * vRel / (a.invMass + b.invMass);
+
+    a.velocity -= contact.tangent * deltaTangentImpulse * a.invMass;
+    b.velocity += contact.tangent * deltaTangentImpulse * b.invMass;
 }
 
 float World::kineticEnergy() const {
     float kineticEnergy = 0;
     for (const Body& body : bodies) {
         if (body.invMass > 0) {
-            kineticEnergy += 0.5 * body.velocity.lengthSquared() * body.mass;
+            kineticEnergy += 0.5f * body.velocity.lengthSquared() * body.mass;
         }
     }
     return kineticEnergy;

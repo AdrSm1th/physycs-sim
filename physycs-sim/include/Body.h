@@ -1,10 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <variant>
 
 #include "Vec2.h"
-
-#include <variant>
 
 struct CircleShape {
     float radius;
@@ -24,10 +23,14 @@ struct Body {
     float invMass;
     Shape shape;
     float restitution;
+    float friction;
     sf::Color color;
 
     Body(Vec2 pos, float radius, float mass, sf::Color color);
     Body(Vec2 pos, Vec2 halfExtents, float mass, sf::Color color);
+    Body(Vec2 pos, float radius, float mass, float friction, sf::Color color);
+    Body(Vec2 pos, Vec2 halfExtents, float mass, float friction,
+         sf::Color color);
     void applyForce(Vec2 f);
     void integrate(float dt, Vec2 gravity = {});
     void setMass(float newMass);
