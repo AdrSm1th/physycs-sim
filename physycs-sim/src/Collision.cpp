@@ -65,22 +65,26 @@ bool circleBoxImpl(Vec2 posA, float radius, Vec2 posB, Vec2 halfExterns,
 
         if (minDist == distLeft) {
             m.normal = {1.0f, 0.0f};
+            m.contactPoint = {posB.x - halfExterns.x, posA.y};
         } else if (minDist == distRight) {
             m.normal = {-1.0f, 0.0f};
+            m.contactPoint = {posB.x + halfExterns.x, posA.y};
         } else if (minDist == distBottom) {
             m.normal = {0.0f, -1.0f};
+            m.contactPoint = {posA.x, posB.y + halfExterns.y};
         } else {
             m.normal = {0.0, 1.0f};
+            m.contactPoint = {posA.x, posB.y - halfExterns.y};
         }
 
         m.penetration = radius + minDist;
     } else {
         m.normal = delta * (1 / dist);
         m.penetration = radius - dist;
+        m.contactPoint = posA + m.normal * radius;
     }
 
     m.valid = true;
-    m.contactPoint = closest;
     return true;
 }
 

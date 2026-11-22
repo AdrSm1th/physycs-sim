@@ -62,6 +62,8 @@ Input Renderer::pollEvent() {
                 event->getIf<sf::Event::MouseButtonPressed>()) {
             if (mousePressed->button == sf::Mouse::Button::Left) {
                 in.mousePressed = true;
+            } else if (mousePressed->button == sf::Mouse::Button::Right) {
+                in.selectQuery = true;
             }
         }
 
@@ -187,6 +189,31 @@ void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
     window.draw(text);
 }
 
+void Renderer::drawBodyInspector(const Body *body) {
+    const ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+
+    ImGui::SetNextWindowPos(ImVec2(windowSize.x - INSPECTOR_WIDTH, 0.0f));
+
+    ImGui::SetNextWindowSize(ImVec2(INSPECTOR_WIDTH, windowSize.y));
+
+    const ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove |
+                                   ImGuiWindowFlags_NoResize |
+                                   ImGuiWindowFlags_NoCollapse;
+
+    if (ImGui::Begin("Body inspector", nullptr, flags)) {
+        if (body == nullptr) {
+            ImGui::TextWrapped("Select body (right mouse button)");
+        } else {
+            ImGui::Text("Velocity: %.2f, %.2f", body->velocity.x,
+                        body->velocity.y);
+
+            ImGui::Text("Angular velocity: %.2f", body->angularVelocity);
+        }
+    }
+
+    ImGui::End();
+}
+
 void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
                               float fixedDt) {
     const ImVec2 windowSize = ImGui::GetIO().DisplaySize;
@@ -304,8 +331,9 @@ bool Renderer::isMouseInScene() const {
     const auto pos = sf::Mouse::getPosition(window);
     const auto size = window.getSize();
 
-    return pos.x >= PANEL_WIDTH && pos.x < static_cast<int>(size.x) &&
+    return pos.x >= PANEL_WIDTH && pos.x < static_cast<int>(size.x) - INSPECTOR_WIDTH &&
            pos.y >= 0 && pos.y < static_cast<int>(size.y);
+    
 }
 
 Body Renderer::GetBodyForCreate() const {

@@ -24,6 +24,11 @@ struct Body {
     Shape shape;
     float restitution;
     float friction;
+    float angleOfRotation;
+    float angularVelocity;
+    float momentOfInertia;
+    float invMomentOfInertia;
+
     sf::Color color;
 
     Body();
@@ -35,4 +40,7 @@ struct Body {
     void applyForce(Vec2 f);
     void integrate(float dt, Vec2 gravity = {});
     void setMass(float newMass);
+
+    private:
+    void Init(Vec2 pos, Vec2 v, Vec2 a, float m, Shape s, float e, float nu, float theta, float w, sf::Color col);
 };

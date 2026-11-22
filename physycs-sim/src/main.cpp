@@ -60,7 +60,7 @@ int WinMain() {
 
         if (in.mouseReleased) {
             if (isAiming && canUseScene) {
-                Body newBody = renderer.GetBodyForCreate(); 
+                Body newBody = renderer.GetBodyForCreate();
                 newBody.position = aimStartPos;
 
                 const Vec2 dragVec = in.mouseWorldPos - aimStartPos;
@@ -70,6 +70,19 @@ int WinMain() {
             }
 
             isAiming = false;
+        }
+
+        if (canUseScene && in.selectQuery) {
+            world.selectedBodyIndex = -1;
+
+            // Так как тела рисуются с начала массива к концу, то тела i + n
+            // могут перекрывать тела i. Поэтому цикл с конца
+            for (int i = static_cast<int>(world.bodies.size()) - 1; i >= 0; --i) {
+                if (world.containsPoint(i, in.mouseWorldPos)) {
+                    world.selectedBodyIndex = i;
+                    break;
+                }
+            }
         }
 
         sf::Time elapsed = clock.restart();
@@ -104,6 +117,9 @@ int WinMain() {
         renderer.beginFrame(elapsed);
 
         renderer.drawImGuiPanel(pause, debugDraw, world, FIXED_DT);
+        Body *selectedBody = world.selectedBodyIndex != -1 ? &world.bodies[world.selectedBodyIndex] : nullptr;
+        renderer.drawBodyInspector(selectedBody);
+        //renderer.drawBodyInspector(&world.bodies[0]);
 
         if (isAiming) {
             Body newBody = renderer.GetBodyForCreate();
@@ -112,9 +128,7 @@ int WinMain() {
             auto *b = std::get_if<BoxShape>(&newBody.shape);
 
             if (c) {
-                renderer.drawCircle(aimStartPos,
-                                    c->radius,
-                                    newBody.color);
+                renderer.drawCircle(aimStartPos, c->radius, newBody.color);
             } else if (b) {
                 renderer.drawBox(aimStartPos, b->halfExtents, newBody.color);
             }
@@ -168,6 +182,18 @@ int WinMain() {
                 Vec2 end = pointOfContact + m.normal * arrowLen;
                 renderer.drawArrow(pointOfContact, end, HEAD_LEN,
                                    sf::Color::Cyan);
+            }
+
+            for (const Body &body : world.bodies) {
+                // Линия для отбражения вращения
+                auto *c = std::get_if<CircleShape>(&body.shape);
+                if (c) {
+                    Vec2 endPos =
+                        body.position + Vec2(cos(body.angleOfRotation),
+                                             sin(body.angleOfRotation)) *
+                                            c->radius;
+                    renderer.drawLine(body.position, endPos, sf::Color::Blue);
+                }
             }
         }
 

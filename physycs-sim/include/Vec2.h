@@ -52,6 +52,8 @@ struct Vec2 {
     bool operator!=(const Vec2 &o) const { return !(*this == o); }
 
     float dot(const Vec2 other) const;
+    float cross(const Vec2 other) const;
+    float cross(const float other) const;
     float length() const;
     float lengthSquared() const;
     Vec2 normalized() const;

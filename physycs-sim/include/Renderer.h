@@ -11,6 +11,7 @@ struct Input {
     bool togglePause = false;
     bool reset = false;
     bool stepOnce = false;
+    bool selectQuery = false;
 
     bool mousePressed = false;
     bool mouseReleased = false;
@@ -30,8 +31,6 @@ struct BodyForCreate {
 
 class Renderer {
    public:
-    static constexpr float PANEL_WIDTH = 250.0f;
-
     Renderer(unsigned int width, unsigned int height, const std::string &title,
              unsigned int fpsLimit);
     ~Renderer();
@@ -52,8 +51,12 @@ class Renderer {
     bool isMouseInScene() const;
     Body GetBodyForCreate() const;
     bool IsSelect() const;
+    void drawBodyInspector(const Body *body);
 
    private:
+    static constexpr float PANEL_WIDTH = 250.0f;
+    static constexpr float INSPECTOR_WIDTH = 250.0f;
+
     sf::View sceneView;
     sf::RenderWindow window;
     sf::Font font;
