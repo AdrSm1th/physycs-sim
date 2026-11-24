@@ -98,11 +98,12 @@ void Renderer::drawCircle(Vec2 pos, float radius, sf::Color color) {
     window.draw(shape);
 }
 
-void Renderer::drawBox(Vec2 pos, Vec2 halfExterns, sf::Color color) {
+void Renderer::drawBox(Vec2 pos, Vec2 halfExterns, sf::Color color, float angle) {
     sf::RectangleShape box;
     box.setSize({halfExterns.x * 2.f, halfExterns.y * 2.f});
     box.setOrigin({halfExterns.x, halfExterns.y});
     box.setPosition({pos.x, pos.y});
+    box.setRotation(sf::radians(angle));
     box.setFillColor(color);
     window.draw(box);
 }

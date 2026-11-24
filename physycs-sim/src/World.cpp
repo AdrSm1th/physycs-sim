@@ -85,22 +85,26 @@ void World::stepInternal(float dt) {
         const Body& a = bodies[contact.a];
         const Body& b = bodies[contact.b];
 
-        Vec2 rA = contact.contactPoint - a.position;
-        Vec2 rB = contact.contactPoint - b.position;
-
-        Vec2 vRotA;
-        Vec2 vRotB;
-
-        computeRot(vRotA, vRotB, a.angularVelocity, b.angularVelocity, rA, rB);
-
-        Vec2 vap = a.velocity + vRotA;
-        Vec2 vbp = b.velocity + vRotB;
-
-        float initialVn = contact.normal.dot(vbp - vap);
         float restitution = std::min(a.restitution, b.restitution);
 
-        contact.targetNormalVelocity =
-            initialVn < -V_THRESHOLD ? -restitution * initialVn : 0.0f;
+        for (ContactPoint& point : contact.points) {
+            Vec2 rA = point.position - a.position;
+            Vec2 rB = point.position - b.position;
+
+            Vec2 vRotA;
+            Vec2 vRotB;
+
+            computeRot(vRotA, vRotB, a.angularVelocity, b.angularVelocity, rA,
+                       rB);
+
+            Vec2 vap = a.velocity + vRotA;
+            Vec2 vbp = b.velocity + vRotB;
+
+            float initialVn = contact.normal.dot(vbp - vap);
+
+            point.targetNormalVelocity =
+                initialVn < -V_THRESHOLD ? -restitution * initialVn : 0.0f;
+        }
     }
 
     for (int i = 0; i < ITERATIONS; i++) {
@@ -120,10 +124,15 @@ void World::stepInternal(float dt) {
             continue;
         }
 
+        float maxPenetration = 0.0f;
+        for (const ContactPoint& point : contact.points) {
+            maxPenetration = std::max(maxPenetration, point.penetration);
+        }
+
         // correction - защита от дрожания и лишних коллизий при групповом
         // столкновении
         float correction =
-            std::max(contact.penetration - SLOP, 0.0f) * CORRECTION_PERCENT;
+            std::max(maxPenetration - SLOP, 0.0f) * CORRECTION_PERCENT;
         correction /= invMassSum;
 
         a.position -= contact.normal * correction * a.invMass;
@@ -193,73 +202,85 @@ void World::setupScene() {
     b.angularVelocity = 0;
     b.restitution = 0;
     bodies.push_back(b);
+
+    Body p(Vec2(500, 400), Vec2(200, 10), 0, sf::Color::White);
+    p.angleOfRotation = 30;
+    p.angularVelocity = 0;
+    bodies.push_back(p);
 }
 
 void World::resolveContact(Manifold& contact) {
     Body& a = bodies[contact.a];
     Body& b = bodies[contact.b];
 
-    Vec2 rA = contact.contactPoint - a.position;
-    Vec2 rB = contact.contactPoint - b.position;
+    for (ContactPoint& contactPoint : contact.points) {
+        Vec2 rA = contactPoint.position - a.position;
+        Vec2 rB = contactPoint.position - b.position;
 
-    Vec2 vRotA;
-    Vec2 vRotB;
-
-    computeRot(vRotA, vRotB, a.angularVelocity, b.angularVelocity, rA, rB);
-
-    Vec2 va = a.velocity + vRotA;
-    Vec2 vb = b.velocity + vRotB;
-
-    Vec2 vRel = vb - va;
-    float vn = contact.normal.dot(vRel);
-
-    float raxn = rA.cross(contact.normal);
-    float rbxn = rB.cross(contact.normal);
-    float raxt = rA.cross(contact.tangent);
-    float rbxt = rB.cross(contact.tangent);
-
-    float kn = a.invMass + b.invMass + a.invMomentOfInertia * raxn * raxn +
-               b.invMomentOfInertia * rbxn * rbxn;
-    float kt = a.invMass + b.invMass + a.invMomentOfInertia * raxt * raxt +
-               b.invMomentOfInertia * rbxt * rbxt;
-
-    if (kt + kn == 0) {
-        return;
-    }
-
-    if (kn > 0) {
-        float deltaNormalImpulse = (contact.targetNormalVelocity - vn) / kn;
-        float oldNI = contact.normalImpulse;
-        float newNI = std::max(0.0f, oldNI + deltaNormalImpulse);
-        deltaNormalImpulse = newNI - oldNI;
-        Vec2 vectorImpulseN = contact.normal * deltaNormalImpulse;
-        a.angularVelocity -= a.invMomentOfInertia * (rA.cross(vectorImpulseN));
-        b.angularVelocity += b.invMomentOfInertia * (rB.cross(vectorImpulseN));
-        contact.normalImpulse = newNI;
+        Vec2 vRotA;
+        Vec2 vRotB;
 
         computeRot(vRotA, vRotB, a.angularVelocity, b.angularVelocity, rA, rB);
 
-        a.velocity -= contact.normal * deltaNormalImpulse * a.invMass;
-        b.velocity += contact.normal * deltaNormalImpulse * b.invMass;
-    }
+        Vec2 va = a.velocity + vRotA;
+        Vec2 vb = b.velocity + vRotB;
 
-    if (kt > 0) {
-        vRel = (b.velocity + vRotB) - (a.velocity + vRotA);
+        Vec2 vRel = vb - va;
+        float vn = contact.normal.dot(vRel);
 
-        float vt = contact.tangent.dot(vRel);
-        float friction = sqrt(a.friction * b.friction);
-        float deltaTangentImpulse = -vt / kt;
-        float oldTI = contact.tangentImpulse;
-        float L = friction * contact.normalImpulse;
-        float newTI = std::clamp(oldTI + deltaTangentImpulse, -L, L);
-        deltaTangentImpulse = newTI - oldTI;
-        Vec2 vectorImpulseT = contact.tangent * deltaTangentImpulse;
-        a.angularVelocity -= a.invMomentOfInertia * (rA.cross(vectorImpulseT));
-        b.angularVelocity += b.invMomentOfInertia * (rB.cross(vectorImpulseT));
-        contact.tangentImpulse = newTI;
+        float raxn = rA.cross(contact.normal);
+        float rbxn = rB.cross(contact.normal);
+        float raxt = rA.cross(contact.tangent);
+        float rbxt = rB.cross(contact.tangent);
 
-        a.velocity -= contact.tangent * deltaTangentImpulse * a.invMass;
-        b.velocity += contact.tangent * deltaTangentImpulse * b.invMass;
+        float kn = a.invMass + b.invMass + a.invMomentOfInertia * raxn * raxn +
+                   b.invMomentOfInertia * rbxn * rbxn;
+        float kt = a.invMass + b.invMass + a.invMomentOfInertia * raxt * raxt +
+                   b.invMomentOfInertia * rbxt * rbxt;
+
+        if (kt + kn == 0) {
+            return;
+        }
+
+        if (kn > 0) {
+            float deltaNormalImpulse = (contactPoint.targetNormalVelocity - vn) / kn;
+            float oldNI = contactPoint.normalImpulse;
+            float newNI = std::max(0.0f, oldNI + deltaNormalImpulse);
+            deltaNormalImpulse = newNI - oldNI;
+            Vec2 vectorImpulseN = contact.normal * deltaNormalImpulse;
+            a.angularVelocity -=
+                a.invMomentOfInertia * (rA.cross(vectorImpulseN));
+            b.angularVelocity +=
+                b.invMomentOfInertia * (rB.cross(vectorImpulseN));
+            contactPoint.normalImpulse = newNI;
+
+            computeRot(vRotA, vRotB, a.angularVelocity, b.angularVelocity, rA,
+                       rB);
+
+            a.velocity -= contact.normal * deltaNormalImpulse * a.invMass;
+            b.velocity += contact.normal * deltaNormalImpulse * b.invMass;
+        }
+
+        if (kt > 0) {
+            vRel = (b.velocity + vRotB) - (a.velocity + vRotA);
+
+            float vt = contact.tangent.dot(vRel);
+            float friction = sqrt(a.friction * b.friction);
+            float deltaTangentImpulse = -vt / kt;
+            float oldTI = contactPoint.tangentImpulse;
+            float L = friction * contactPoint.normalImpulse;
+            float newTI = std::clamp(oldTI + deltaTangentImpulse, -L, L);
+            deltaTangentImpulse = newTI - oldTI;
+            Vec2 vectorImpulseT = contact.tangent * deltaTangentImpulse;
+            a.angularVelocity -=
+                a.invMomentOfInertia * (rA.cross(vectorImpulseT));
+            b.angularVelocity +=
+                b.invMomentOfInertia * (rB.cross(vectorImpulseT));
+            contactPoint.tangentImpulse = newTI;
+
+            a.velocity -= contact.tangent * deltaTangentImpulse * a.invMass;
+            b.velocity += contact.tangent * deltaTangentImpulse * b.invMass;
+        }
     }
 }
 
@@ -284,8 +305,9 @@ bool World::containsPoint(int bodyIdx, Vec2 point) const {
     }
 
     if (const auto* b = std::get_if<BoxShape>(&body.shape)) {
-        return std::abs(delta.x) <= b->halfExtents.x &&
-               std::abs(delta.y) <= b->halfExtents.y;
+        Vec2 deltaRot = delta.rotated(-body.angleOfRotation);
+        return std::abs(deltaRot.x) <= b->halfExtents.x &&
+               std::abs(deltaRot.y) <= b->halfExtents.y;
     }
 
     return false;

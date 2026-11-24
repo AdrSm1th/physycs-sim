@@ -53,10 +53,11 @@ struct Vec2 {
 
     float dot(const Vec2 other) const;
     float cross(const Vec2 other) const;
-    float cross(const float other) const;
     float length() const;
     float lengthSquared() const;
     Vec2 normalized() const;
     void normalize();
     void perpendicular();
+    void rotate(float angle);
+    Vec2 rotated(float angle) const;
 };

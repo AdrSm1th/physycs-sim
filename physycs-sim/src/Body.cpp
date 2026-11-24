@@ -20,7 +20,8 @@ void Body::Init(Vec2 pos, Vec2 v, Vec2 a, float m, Shape s, float e, float nu,
     if (c) {
         momentOfInertia = 0.5 * mass * c->radius * c->radius;
     } else if (b) {
-        momentOfInertia = 0.0f;
+        momentOfInertia = (mass / 3) * (b->halfExtents.x * b->halfExtents.x +
+                                        b->halfExtents.y * b->halfExtents.y);
     }
 
     invMomentOfInertia = momentOfInertia != 0 ? 1 / momentOfInertia : 0;
@@ -76,7 +77,8 @@ void Body::setMass(float newMass) {
     if (c) {
         momentOfInertia = 0.5 * mass * c->radius * c->radius;
     } else if (b) {
-        momentOfInertia = 0.0f;
+        momentOfInertia = (mass / 3) * (b->halfExtents.x * b->halfExtents.x +
+                                        b->halfExtents.y * b->halfExtents.y);
     }
 
     invMomentOfInertia = momentOfInertia != 0 ? 1 / momentOfInertia : 0;

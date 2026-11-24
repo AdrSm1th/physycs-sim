@@ -77,7 +77,8 @@ int WinMain() {
 
             // Так как тела рисуются с начала массива к концу, то тела i + n
             // могут перекрывать тела i. Поэтому цикл с конца
-            for (int i = static_cast<int>(world.bodies.size()) - 1; i >= 0; --i) {
+            for (int i = static_cast<int>(world.bodies.size()) - 1; i >= 0;
+                 --i) {
                 if (world.containsPoint(i, in.mouseWorldPos)) {
                     world.selectedBodyIndex = i;
                     break;
@@ -117,9 +118,11 @@ int WinMain() {
         renderer.beginFrame(elapsed);
 
         renderer.drawImGuiPanel(pause, debugDraw, world, FIXED_DT);
-        Body *selectedBody = world.selectedBodyIndex != -1 ? &world.bodies[world.selectedBodyIndex] : nullptr;
+        Body *selectedBody = world.selectedBodyIndex != -1
+                                 ? &world.bodies[world.selectedBodyIndex]
+                                 : nullptr;
         renderer.drawBodyInspector(selectedBody);
-        //renderer.drawBodyInspector(&world.bodies[0]);
+        // renderer.drawBodyInspector(&world.bodies[0]);
 
         if (isAiming) {
             Body newBody = renderer.GetBodyForCreate();
@@ -130,7 +133,8 @@ int WinMain() {
             if (c) {
                 renderer.drawCircle(aimStartPos, c->radius, newBody.color);
             } else if (b) {
-                renderer.drawBox(aimStartPos, b->halfExtents, newBody.color);
+                renderer.drawBox(aimStartPos, b->halfExtents, newBody.color,
+                                 newBody.angleOfRotation);
             }
 
             renderer.drawArrow(aimStartPos, in.mouseWorldPos, 15.f,
@@ -146,7 +150,7 @@ int WinMain() {
                                             body.color);
                     } else if constexpr (std::is_same_v<T, BoxShape>) {
                         renderer.drawBox(body.position, arg.halfExtents,
-                                         body.color);
+                                         body.color, body.angleOfRotation);
                     }
                 },
                 body.shape);
@@ -168,20 +172,28 @@ int WinMain() {
                 const Body &a = world.bodies[m.a];
                 const Body &b = world.bodies[m.b];
 
-                float t = std::clamp(m.penetration / MAX_PENETRATION, 0.f, 1.f);
+                float maxPenetration = 0.0f;
+                for (const ContactPoint &point : m.points) {
+                    maxPenetration =
+                        std::max(point.penetration, maxPenetration);
+                }
+                float t =
+                    std::clamp(maxPenetration / MAX_PENETRATION, 0.f, 1.f);
                 sf::Color color(255, static_cast<std::uint8_t>(255 * (1.f - t)),
                                 0);
                 renderer.drawLine(a.position, b.position, color);
 
-                Vec2 pointOfContact = m.contactPoint;
-                renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
+                for (const ContactPoint &point : m.points) {
+                    Vec2 pointOfContact = point.position;
+                    renderer.drawPoint(pointOfContact, 2.0f, sf::Color::Red);
 
-                float arrowLen = m.penetration * SCALE;
-                if (arrowLen < MIN_VISIBLE) continue;
+                    float arrowLen = point.penetration * SCALE;
+                    if (arrowLen < MIN_VISIBLE) continue;
 
-                Vec2 end = pointOfContact + m.normal * arrowLen;
-                renderer.drawArrow(pointOfContact, end, HEAD_LEN,
-                                   sf::Color::Cyan);
+                    Vec2 end = pointOfContact + m.normal * arrowLen;
+                    renderer.drawArrow(pointOfContact, end, HEAD_LEN,
+                                       sf::Color::Cyan);
+                }
             }
 
             for (const Body &body : world.bodies) {

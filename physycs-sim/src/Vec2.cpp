@@ -28,3 +28,18 @@ void Vec2::perpendicular() {
     x = -y;
     y = temp;
 }
+
+void Vec2::rotate(float angle) {
+    float xr = x * cos(angle) - y * sin(angle);
+    float yr = x * sin(angle) + y * cos(angle);
+
+    x = xr;
+    y = yr;
+}
+
+Vec2 Vec2::rotated(float angle) const {
+    float xr = x * cos(angle) - y * sin(angle);
+    float yr = x * sin(angle) + y * cos(angle);
+
+    return {xr, yr};
+}
