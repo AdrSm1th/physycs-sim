@@ -83,3 +83,19 @@ void Body::setMass(float newMass) {
 
     invMomentOfInertia = momentOfInertia != 0 ? 1 / momentOfInertia : 0;
 }
+
+void Body::updateMass() {
+    invMass = mass > 0.0f ? 1.0f / mass : 0.0f;
+
+    auto *c = std::get_if<CircleShape>(&shape);
+    auto *b = std::get_if<BoxShape>(&shape);
+
+    if (c) {
+        momentOfInertia = 0.5 * mass * c->radius * c->radius;
+    } else if (b) {
+        momentOfInertia = (mass / 3) * (b->halfExtents.x * b->halfExtents.x +
+                                        b->halfExtents.y * b->halfExtents.y);
+    }
+
+    invMomentOfInertia = momentOfInertia != 0 ? 1 / momentOfInertia : 0;
+}

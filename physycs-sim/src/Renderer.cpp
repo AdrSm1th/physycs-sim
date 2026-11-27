@@ -191,7 +191,7 @@ void Renderer::debugDrawText(float FPS, int bodiesCount, int contatctCount,
     window.draw(text);
 }
 
-void Renderer::drawBodyInspector(const Body *body) {
+bool Renderer::drawBodyInspector(Body *body) {
     const ImVec2 windowSize = ImGui::GetIO().DisplaySize;
 
     ImGui::SetNextWindowPos(ImVec2(windowSize.x - INSPECTOR_WIDTH, 0.0f));
@@ -202,21 +202,37 @@ void Renderer::drawBodyInspector(const Body *body) {
                                    ImGuiWindowFlags_NoResize |
                                    ImGuiWindowFlags_NoCollapse;
 
+    bool deleteRequested = false;
+
     if (ImGui::Begin("Body inspector", nullptr, flags)) {
         if (body == nullptr) {
             ImGui::TextWrapped("Select body (right mouse button)");
         } else {
-            ImGui::Text("Mass: %.1f", body->mass);
+            ImGui::InputFloat("Mass", &body->mass, 1.0f, 5.0f, "%.2f");
+            body->mass = std::max(0.0f, body->mass);
+            body->updateMass();
             ImGui::Text("Moment of inertia: %.1f", body->momentOfInertia);
-            ImGui::Text("Friction: %.2f", body->friction);
-            ImGui::Text("Restitutuion: %.2f", body->restitution);
+
+            ImGui::InputFloat("Friction", &body->friction, 0.01f, 0.1f, "%.2f");
+            body->friction = std::clamp(body->friction, 0.0f, 1.0f);
+
+            ImGui::InputFloat("Restitution", &body->restitution, 0.01f, 0.1f,
+                              "%.2f");
+            body->restitution = std::clamp(body->restitution, 0.0f, 1.0f);
+
             ImGui::Text("Velocity: %.2f, %.2f", body->velocity.x,
                         body->velocity.y);
+
             ImGui::Text("Angular velocity: %.2f", body->angularVelocity);
+            if (ImGui::Button("Delete body")) {
+                deleteRequested = true;
+            }
         }
     }
 
     ImGui::End();
+
+    return deleteRequested;
 }
 
 void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
@@ -291,7 +307,6 @@ void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
                                   "%.1f");
                 bodyForCreate.height = std::max(1.0f, bodyForCreate.height);
 
-                ImGui::Separator();
 
                 ImGui::InputFloat("Width", &bodyForCreate.width, 1.0f, 5.0f,
                                   "%.1f");
@@ -300,6 +315,7 @@ void Renderer::drawImGuiPanel(bool &pause, bool &debugDraw, World &world,
                 bodyForCreate.shape = BoxShape(
                     {bodyForCreate.width / 2.0f, bodyForCreate.height / 2.0f});
             }
+            ImGui::Separator();
         }
     }
     ImGui::End();

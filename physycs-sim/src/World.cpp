@@ -312,3 +312,14 @@ bool World::containsPoint(int bodyIdx, Vec2 point) const {
 
     return false;
 }
+
+void World::removeBody(int index) {
+    if (index < 0 || index >= static_cast<int>(bodies.size())) {
+        return;
+    }
+
+    bodies.erase(bodies.begin() + index);
+
+    selectedBodyIndex = -1;
+    contacts.clear();
+}

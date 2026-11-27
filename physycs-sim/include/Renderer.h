@@ -52,7 +52,7 @@ class Renderer {
     bool isMouseInScene() const;
     Body GetBodyForCreate() const;
     bool IsSelect() const;
-    void drawBodyInspector(const Body *body);
+    bool drawBodyInspector(Body *body);
 
    private:
     static constexpr float PANEL_WIDTH = 250.0f;

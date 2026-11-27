@@ -121,8 +121,10 @@ int WinMain() {
         Body *selectedBody = world.selectedBodyIndex != -1
                                  ? &world.bodies[world.selectedBodyIndex]
                                  : nullptr;
-        renderer.drawBodyInspector(selectedBody);
-        // renderer.drawBodyInspector(&world.bodies[0]);
+        if (renderer.drawBodyInspector(selectedBody)) {
+            world.removeBody(world.selectedBodyIndex);
+            selectedBody = nullptr;
+        }
 
         if (isAiming) {
             Body newBody = renderer.GetBodyForCreate();

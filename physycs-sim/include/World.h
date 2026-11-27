@@ -18,6 +18,7 @@ struct World {
     void resolveContact(Manifold& contact);
     float kineticEnergy() const;
     bool containsPoint(int bodyIdx, Vec2 point) const;
+    void removeBody(int index);
 
     private:
     void stepInternal(float dt);
