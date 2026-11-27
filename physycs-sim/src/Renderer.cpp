@@ -98,7 +98,8 @@ void Renderer::drawCircle(Vec2 pos, float radius, sf::Color color) {
     window.draw(shape);
 }
 
-void Renderer::drawBox(Vec2 pos, Vec2 halfExterns, sf::Color color, float angle) {
+void Renderer::drawBox(Vec2 pos, Vec2 halfExterns, sf::Color color,
+                       float angle) {
     sf::RectangleShape box;
     box.setSize({halfExterns.x * 2.f, halfExterns.y * 2.f});
     box.setOrigin({halfExterns.x, halfExterns.y});
@@ -205,9 +206,12 @@ void Renderer::drawBodyInspector(const Body *body) {
         if (body == nullptr) {
             ImGui::TextWrapped("Select body (right mouse button)");
         } else {
+            ImGui::Text("Mass: %.1f", body->mass);
+            ImGui::Text("Moment of inertia: %.1f", body->momentOfInertia);
+            ImGui::Text("Friction: %.2f", body->friction);
+            ImGui::Text("Restitutuion: %.2f", body->restitution);
             ImGui::Text("Velocity: %.2f, %.2f", body->velocity.x,
                         body->velocity.y);
-
             ImGui::Text("Angular velocity: %.2f", body->angularVelocity);
         }
     }
@@ -332,9 +336,9 @@ bool Renderer::isMouseInScene() const {
     const auto pos = sf::Mouse::getPosition(window);
     const auto size = window.getSize();
 
-    return pos.x >= PANEL_WIDTH && pos.x < static_cast<int>(size.x) - INSPECTOR_WIDTH &&
-           pos.y >= 0 && pos.y < static_cast<int>(size.y);
-    
+    return pos.x >= PANEL_WIDTH &&
+           pos.x < static_cast<int>(size.x) - INSPECTOR_WIDTH && pos.y >= 0 &&
+           pos.y < static_cast<int>(size.y);
 }
 
 Body Renderer::GetBodyForCreate() const {
